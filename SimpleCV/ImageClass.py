@@ -13545,9 +13545,6 @@ class Image:
             logger.warning('No suitable features in image detected, returning original Image')
             return self
 
-
-
-
         l = np.array( [line.length() for line in lines ])
         a = np.array( [line.angle() for line in lines ] )
         xSum = sum([line.end_points[0][0] + line.end_points[1][0] for line in lines])
@@ -13555,15 +13552,8 @@ class Image:
         
         x,y = xSum/2/n,ySum/2/n
 
-
-
-
-        index = 0
-        mini = None
-
         valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
         index =  np.argmin(valueArray)
-        print index
         #rotate image
         return self.rotate(-index,point = [x,y],fixed = fixed)
 
