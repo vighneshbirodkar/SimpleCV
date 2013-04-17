@@ -13538,52 +13538,32 @@ class Image:
         #Array of lengths of dtected lines.
         lenArray = np.array([])
         
-        #Point about which to rotate.
-        x = 0
-        y = 0
-
-
         lines = self.findLines(threshold,minLength,maxGap,t1,t1)
         n = len(lines)
-        for line in lines:
-
-            #Store lengths and angles of lines.
-            lenArray = np.append(lenArray,line.length())
-            angArray = np.append(angArray,line.angle())
-
-            #Find the mean of centers of all lines. ( I know i should be dividing by 2 )
-            x += line.end_points[0][0] + line.end_points[1][0]
-            y += line.end_points[0][1] + line.end_points[1][1]
 
         if(n == 0 ):
             logger.warning('No suitable features in image detected, returning original Image')
             return self
 
-        #Dividing by 2 now, to save time.
-        x = x/(2*n)
-        y = y/(2*n)
+
+
+
+        l = np.array( [line.length() for line in lines ])
+        a = np.array( [line.angle() for line in lines ] )
+        xSum = sum([line.end_points[0][0] + line.end_points[1][0] for line in lines])
+        ySum = sum([line.end_points[0][1] + line.end_points[1][1] for line in lines])
+        
+        x,y = xSum/2/n,ySum/2/n
+
+
+
+
         index = 0
         mini = None
 
-        for angle in range(180):
-            
-            #Difference in orientation of line from vertical and horizontal.
-            ang1 = abs(angArray - 90 + angle)
-            ang2 = abs(angArray + 90 + angle)
-            ang3 = abs(angArray + angle )
-            
-            #Compute deviation every line is from being vertical or horizontal.
-            angMin = np.minimum(np.minimum(ang1,ang2),ang3)
-
-            #Multiply length of each line from its deviation. The bigger the 
-            #the more significant it's contribution to 'value' if it is not
-            #vertical or horizontal. 
-            value = np.sum(np.multiply(lenArray,angMin))
-            
-            #Find anfle which gives minimum 'value'
-            if( mini == None or value < mini ):
-                mini = value
-                index = angle
+        valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
+        index =  np.argmin(valueArray)
+        print index
         #rotate image
         return self.rotate(-index,point = [x,y],fixed = fixed)
 
