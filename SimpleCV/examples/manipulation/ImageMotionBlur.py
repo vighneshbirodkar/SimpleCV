@@ -46,7 +46,7 @@ while not display.isDone():
         angle -= 5
         blur = img.motionBlur(power,angle)
         blur.save(display)
-        blur.save('c.jpg')
+        #blur.save('c.jpg')
     if( pygame.key.get_pressed()[pygame.K_RIGHT] != 0 ):
         angle += 5
         blur = img.motionBlur(power,angle)
