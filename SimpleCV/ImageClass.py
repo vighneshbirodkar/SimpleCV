@@ -13532,32 +13532,56 @@ class Image:
 
 
         """
+#        import matplotlib.pyplot as plt
+#        #Array of all angled of detected lines.
+#        angArray = np.array([])
+#        #Array of lengths of dtected lines.
+#        lenArray = np.array([])
+#        
+#        lines = self.findLines(threshold,minLength,maxGap,t1,t1)
+#        n = len(lines)
 
-        #Array of all angled of detected lines.
-        angArray = np.array([])
-        #Array of lengths of dtected lines.
-        lenArray = np.array([])
-        
-        lines = self.findLines(threshold,minLength,maxGap,t1,t1)
-        n = len(lines)
+#        if(n == 0 ):
+#            logger.warning('No suitable features in image detected, returning original Image')
+#            return self
 
-        if(n == 0 ):
-            logger.warning('No suitable features in image detected, returning original Image')
-            return self
+#        l = np.array( [line.length() for line in lines ])
+#        a = np.array( [line.angle() for line in lines ] )
+#        xSum = sum([line.end_points[0][0] + line.end_points[1][0] for line in lines])
+#        ySum = sum([line.end_points[0][1] + line.end_points[1][1] for line in lines])
+#        binn = [[] for i in range(18)]
+#        hist = [0 for i in range(18)]
+#        x,y = xSum/2/n,ySum/2/n
 
-        l = np.array( [line.length() for line in lines ])
-        a = np.array( [line.angle() for line in lines ] )
-        xSum = sum([line.end_points[0][0] + line.end_points[1][0] for line in lines])
-        ySum = sum([line.end_points[0][1] + line.end_points[1][1] for line in lines])
-        
-        x,y = xSum/2/n,ySum/2/n
-
-        valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
-        index =  np.argmin(valueArray)
+#        valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
+#        index =  np.argmin(valueArray)
         #rotate image
-        return self.rotate(-index,point = [x,y],fixed = fixed)
-
-
+        wd = self.width*500/self.height
+        small = self.resize(wd,500)
+        gray = small.getGrayNumpy()
+        gray = gray/16
+        gray = gray*16
+        grayImg = Image(gray)
+        grayImg = grayImg.smooth(aperture = (15,15))
+        lines = grayImg.findLines()
+        #lines.draw(width=2,color = Color.RED)
+        #return grayImg.applyLayers()
+        
+        binn = [[] for i in range(18)]
+        hist = [0 for i in range(18)]
+        for line in lines:
+            a = int(line.angle())/18
+            binn[a] += [line]
+            hist[a] +=  line.length()
+            
+        index = np.argmax(np.array(hist))
+        if(len(binn[index])==0):
+            return self
+        avg = sum([line.angle()*line.length() for line in binn[index]])/sum([line.length() for line in binn[index] ])
+        for line in binn[index]:
+            line.draw(width = 3,color = Color.RED)
+        final = grayImg.applyLayers()
+        return self.rotate(avg,fixed = False)
 from SimpleCV.Features import FeatureSet, Feature, Barcode, Corner, HaarFeature, Line, Chessboard, TemplateMatch, BlobMaker, Circle, KeyPoint, Motion, KeypointMatch, CAMShift, TrackSet, LK, SURFTracker
 from SimpleCV.Tracking import CAMShiftTracker, lkTracker, surfTracker, MFTrack
 from SimpleCV.Stream import JpegStreamer
