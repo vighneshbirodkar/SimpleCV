@@ -13499,7 +13499,7 @@ class Image:
         retval=self.convolve(kernel=kernel/div)
         return retval
 
-    def smartRotate(self,threshold=80,minLength=30,maxGap=10,t1=50,t2=100,fixed = True):
+    def smartRotate(self,bins=18,point = [-1,-1],auto = True,threshold=80,minLength=30,maxGap=10,t1=150,t2=200,fixed = True):
         """
         **SUMMARY**
 
@@ -13507,19 +13507,34 @@ class Image:
         approximately parellel to horizontal or vertical edges.
 
         **Parameters**
-
-        * *threshold* - minimum "strength" of the line, used in line detection 
-            step.refer to :py:meth:`findLines` for details.
-        * *minLength* - how many pixels long the line must be to be returned.
-            refer to :py:meth:`findLines` for details.
+        
+        
+        * *bins* - The number of bins the lines will be grouped into.
+        
+        * *point* - the point about which to rotate, refer :py:meth:`rotate`
+        
+        * *auto* - If true point will be computed to the mean of centers of all
+            the lines in the selected bin. If auto is True, value of point is
+            ignored
+            
+        * *threshold* - which determines the minimum "strength" of the line
+            refer :py:meth:`findLines` for details.
+            
+        * *minLength* - how many pixels long the line must be to be returned,
+            refer :py:meth:`findLines` for details.
+            
         * *maxGap* - how much gap is allowed between line segments to consider 
             them the same line .refer to :py:meth:`findLines` for details.
+            
         * *t1* - thresholds used in the edge detection step, 
             refer to :py:meth:`_getEdgeMap` for details.
+            
         * *t2* - thresholds used in the edge detection step, 
             refer to :py:meth:`_getEdgeMap` for details.
+            
         * *fixed* - if fixed is true,keep the original image dimensions, 
-            otherwise scale the image to fit the rotation
+            otherwise scale the image to fit the rotation , refer to 
+            :py:meth:`rotate`
 
         **RETURNS**
 
@@ -13529,66 +13544,44 @@ class Image:
         >>> i = Image ('image.jpg')
         >>> i.smartRotate().show()
 
-
-
         """
-#        import matplotlib.pyplot as plt
-#        #Array of all angled of detected lines.
-#        angArray = np.array([])
-#        #Array of lengths of dtected lines.
-#        lenArray = np.array([])
-#        
-#        lines = self.findLines(threshold,minLength,maxGap,t1,t1)
-#        n = len(lines)
-
-#        if(n == 0 ):
-#            logger.warning('No suitable features in image detected, returning original Image')
-#            return self
-
-#        l = np.array( [line.length() for line in lines ])
-#        a = np.array( [line.angle() for line in lines ] )
-#        xSum = sum([line.end_points[0][0] + line.end_points[1][0] for line in lines])
-#        ySum = sum([line.end_points[0][1] + line.end_points[1][1] for line in lines])
-#        binn = [[] for i in range(18)]
-#        hist = [0 for i in range(18)]
-#        x,y = xSum/2/n,ySum/2/n
-
-#        valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
-#        index =  np.argmin(valueArray)
-        #rotate image
-        #wd = self.width*500/self.height
-        #small = self.resize(wd,500)
-        #small = small.palettize(bins=4,hue=True)
-        #gray = small.getGrayNumpy()
-        #gray = gray/16
-        #gray = gray*16
-        #grayImg = Image(gray)
-        #grayImg = grayImg.smooth(aperture = (15,15))
-        img = self#.smooth(aperture = (15,15))
-        lines = img.findLines(cannyth1=150,cannyth2 = 200)
-        #lines.draw(width=2,color = Color.RED)
-        #return grayImg.applyLayers()
+        lines = self.findLines(cannyth1=150,cannyth2 = 200)
         
-        binn = [[] for i in range(18)]
-        hist = [0 for i in range(18)]
-        for line in lines:
-            a = int(line.angle())/18
-            binn[a] += [line]
-            hist[a] +=  line.length()
-            
+        if(len(lines) == 0):
+            logger.warning("No lines foubd in the image")
+
+        # Initialize empty bins
+        binn = [[] for i in range(bins)]
+        
+        #Convert angle to bin number
+        conv = lambda x:int(x+90)/bins
+
+        #Adding lines to bins
+        [ binn[conv(line.angle())].append(line) for line in lines ]
+
+        #computing histogram, value of each column is total length of all lines
+        #in the bin
+        hist = [ sum([line.length() for line in lines]) for lines in binn]
+        
+        #The maximum histogram
         index = np.argmax(np.array(hist))
-        if(len(binn[index])==0):
-            return self
+        
+        #Good ol weighted mean, for the selected bin
         avg = sum([line.angle()*line.length() for line in binn[index]])/sum([line.length() for line in binn[index] ])
-        for line in binn[index]:
-            line.draw(width = 3,color = Color.RED) 
-        final = self.applyLayers()
+
+        #Mean of centers of all lines in selected bin
+        if(auto and len(lines) > 0):
+            x = sum([line.end_points[0][0] + line.end_points[1][0] for line in binn[index]])/2/len(binn[index])
+            y = sum([line.end_points[0][1] + line.end_points[1][1] for line in binn[index]])/2/len(binn[index])
+            point = [x,y]
+
+        #Determine whether to rotate the line to vertical or horizontal 
         if (-45 <= avg <= 45):
-            return self.rotate(avg,fixed = False)
+            return self.rotate(avg,fixed = fixed,point = point)
         elif (avg > 45):
-            return self.rotate(avg-90,fixed = False)
+            return self.rotate(avg-90,fixed = fixed,point = point)
         else:
-            return self.rotate(avg+90,fixed = False)
+            return self.rotate(avg+90,fixed = fixed,point = point)
 
 
 from SimpleCV.Features import FeatureSet, Feature, Barcode, Corner, HaarFeature, Line, Chessboard, TemplateMatch, BlobMaker, Circle, KeyPoint, Motion, KeypointMatch, CAMShift, TrackSet, LK, SURFTracker
