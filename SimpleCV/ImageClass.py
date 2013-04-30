@@ -13556,14 +13556,16 @@ class Image:
 #        valueArray = np.array([np.sum(np.multiply(l,np.minimum(np.minimum(abs(a-90+t),abs(a+90+t)),abs(a+t)))) for t in range(180)])
 #        index =  np.argmin(valueArray)
         #rotate image
-        wd = self.width*500/self.height
-        small = self.resize(wd,500)
-        gray = small.getGrayNumpy()
-        gray = gray/16
-        gray = gray*16
-        grayImg = Image(gray)
-        grayImg = grayImg.smooth(aperture = (15,15))
-        lines = grayImg.findLines()
+        #wd = self.width*500/self.height
+        #small = self.resize(wd,500)
+        #small = small.palettize(bins=4,hue=True)
+        #gray = small.getGrayNumpy()
+        #gray = gray/16
+        #gray = gray*16
+        #grayImg = Image(gray)
+        #grayImg = grayImg.smooth(aperture = (15,15))
+        img = self#.smooth(aperture = (15,15))
+        lines = img.findLines(cannyth1=150,cannyth2 = 200)
         #lines.draw(width=2,color = Color.RED)
         #return grayImg.applyLayers()
         
@@ -13579,9 +13581,16 @@ class Image:
             return self
         avg = sum([line.angle()*line.length() for line in binn[index]])/sum([line.length() for line in binn[index] ])
         for line in binn[index]:
-            line.draw(width = 3,color = Color.RED)
-        final = grayImg.applyLayers()
-        return self.rotate(avg,fixed = False)
+            line.draw(width = 3,color = Color.RED) 
+        final = self.applyLayers()
+        if (-45 <= avg <= 45):
+            return self.rotate(avg,fixed = False)
+        elif (avg > 45):
+            return self.rotate(avg-90,fixed = False)
+        else:
+            return self.rotate(avg+90,fixed = False)
+
+
 from SimpleCV.Features import FeatureSet, Feature, Barcode, Corner, HaarFeature, Line, Chessboard, TemplateMatch, BlobMaker, Circle, KeyPoint, Motion, KeypointMatch, CAMShift, TrackSet, LK, SURFTracker
 from SimpleCV.Tracking import CAMShiftTracker, lkTracker, surfTracker, MFTrack
 from SimpleCV.Stream import JpegStreamer
