@@ -43,14 +43,17 @@ class GtkWorker(Process):
         
         
         self.window = builder.get_object("window")
-        self.image = builder.get_object("image")
+        self.drawingArea = builder.get_object("drawingArea")
         self.eventBox = builder.get_object("eventbox")
         self.eventBox.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
+        
+        #when an image arrives, its data is stored here
+        self.imageData = None
         
         if(self.type_ == DisplayBase.FULLSCREEN):
             self.window.fullscreen()
         else:
-            self.image.set_size_request(*self.size)
+            self.drawingArea.set_size_request(*self.size)
             self.window.set_resizable(False)
 
         self.window.set_title(self.title)
@@ -82,7 +85,6 @@ class GtkWorker(Process):
         #check if there is any data to be read, wait for 100ms
         #Is used because select.select/poll and gobject.idle_add dont work on windows
         dataThere = self.connection.poll(.10)
-        
         #handle data if it's there
         if(dataThere):
             self.checkMsg()
@@ -94,6 +96,7 @@ class GtkWorker(Process):
         
         #examine the message and figure out what to do with it
         msg = self.connection.recv()
+
         if(type(msg) is dict):
             funcName = "handle_" + msg['function']
             funcToCall = self.__getattribute__(funcName)
@@ -103,16 +106,15 @@ class GtkWorker(Process):
             
     def handle_showImage(self,data):
         #show image from string
-        pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
 
-        self.cairoContext = self.image.window.cairo_create()
-        self.image.set_from_pixbuf(pix)
-        
+        self.imageData = data
+        self.drawingArea.queue_draw()
+
         if(self.type_ == DisplayBase.DEFAULT):
-            self.image.set_size_request(data['width'],data['height'])
+            self.drawingArea.set_size_request(data['width'],data['height'])
         elif(self.type_ == DisplayBase.FIXED):
             pass
-        #self.image.set_size_request(10000,10000)
+
         
         
         #print self.image.size_request()
@@ -130,7 +132,7 @@ class GtkWorker(Process):
         #closed
         
     def handle_getImageWidgetSize(self,data):
-        self.connection.send((self.image.get_allocation().width,self.image.get_allocation().height))
+        self.connection.send((self.drawingArea.get_allocation().width,self.drawingArea.get_allocation().height))
 
     def handle_configure_event(self,widget,event):
         self._winWidth = event.width
@@ -251,5 +253,18 @@ class GtkWorker(Process):
         self.connection.send((self._scrollDir,))
         self._scrollDir = None
 
+    def draw(self,widget,eventData = None):
+        data = self.imageData
+        if(self.imageData != None ):
+            pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
+            cr = widget.window.cairo_create()
+            cr.set_source_pixbuf(pix,0,0)
+            cr.paint()
+
+        #img = Image('lenna')
+        #pix =  self.gtk.gdk.pixbuf_new_from_data(img.toSring(), self.gtk.gdk.COLORSPACE_RGB, False, img.depth,img.width, img.height, img.width*3)
+        
+        
+            
 
 

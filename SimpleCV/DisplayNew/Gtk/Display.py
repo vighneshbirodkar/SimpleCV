@@ -84,6 +84,7 @@ class GtkDisplay(DisplayBase):
                 #TODO raise an exception here maybe, cause many other functions
                 #may get a value they are not expecting
                 pass
+        
             
         
         if(self.workerAlive):
