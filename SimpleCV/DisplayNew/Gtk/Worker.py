@@ -178,6 +178,7 @@ class GtkWorker(Process):
         else:
             p = None
         self.connection.send((p,))
+        self._leftMouseDownPos = None
 
     def handle_rightButtonDownPosition(self, data):
         if self._rightMouseDownPos is not None:
@@ -185,6 +186,7 @@ class GtkWorker(Process):
         else:
             p = None
         self.connection.send((p,))
+        self._rightMouseDownPos = None
 
     def handle_leftButtonUpPosition(self,data):
         if self._leftMouseUpPos is not None:
@@ -192,6 +194,7 @@ class GtkWorker(Process):
         else:
             p = None
         self.connection.send((p,))
+        self._leftMouseUpPos = None
 
     def handle_rightButtonUpPosition(self,data):
         if self._rightMouseUpPos is not None:
@@ -199,3 +202,4 @@ class GtkWorker(Process):
         else:
             p = None
         self.connection.send((p,))
+        self._rightMouseUpPos = None
