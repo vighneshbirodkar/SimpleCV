@@ -144,4 +144,33 @@ class GtkDisplay(DisplayBase):
             dic['function'] = 'rightButtonUpPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
-       
+
+    def middleButtonDownPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'middleButtonDownPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def middleButtonUpPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'middleButtonUpPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def mouseScrollPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mouseScrollPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def mouseScrollType(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mouseScrollType'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+
