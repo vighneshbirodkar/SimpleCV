@@ -219,16 +219,16 @@ class GtkWorker(Process):
         self._mouseX = self.image.get_pointer() [0]
         if self._mouseX < 0:
             self._mouseX = 0
-        if self._mouseX > self.image.get_allocation().width:
-            self._mouseX = self.image.get_allocation().width
+        if self._mouseX > self.drawingArea.get_allocation().width:
+            self._mouseX = self.drawingArea.get_allocation().width
         self.connection.send((self._mouseX,))
 
     def handle_mouseY(self,data):
         self._mouseY = self.image.get_pointer() [1]
         if self._mouseY < 0:
             self._mouseY = 0
-        if self._mouseY > self.image.get_allocation().height:
-            self._mouseY = self.image.get_allocation().height
+        if self._mouseY > self.drawingArea.get_allocation().height:
+            self._mouseY = self.drawingArea.get_allocation().height
         self.connection.send((self._mouseY,))
 
     def mouse_press(self,widget,event):
@@ -258,12 +258,12 @@ class GtkWorker(Process):
         pos = list(pos)
         if pos[0] < 0:
             pos[0] = 0
-        elif pos[0] > self.image.get_allocation().width:
-            pos[0] = self.image.get_allocation().width
+        elif pos[0] > self.drawingArea.get_allocation().width:
+            pos[0] = self.drawingArea.get_allocation().width
         if pos[1] < 0:
             pos[1] = 0
-        elif pos[1] > self.image.get_allocation().height:
-            pos[1] = self.image.get_allocation().height
+        elif pos[1] > self.drawingArea.get_allocation().height:
+            pos[1] = self.drawingArea.get_allocation().height
         return tuple(pos)
 
     def handle_leftButtonDownPosition(self, data):
