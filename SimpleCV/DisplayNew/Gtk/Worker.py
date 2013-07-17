@@ -3,9 +3,14 @@ import os
 from ..Base import DisplayBase
 
 
+def getCentreOffset(box1,box2):
+    return (box1[0] - box2[0])/2, (box1[1] - box2[1])/2 
+
+
+
 #returns x,y,xScale,yScale
 #copied from adaptiveScale in ImageClass
-def smartScale(src, resolution):
+def smartScale(gdk, src, resolution):
     srcWidth = src.get_width()
     srcHeight = src.get_height()
     srcSize = srcWidth,srcHeight
@@ -17,14 +22,14 @@ def smartScale(src, resolution):
     targety = 0
     targetw = resolution[0]
     targeth = resolution[1]
-
+    print srcHeight
     if( srcSize == resolution): # we have to resize
-        return 0,0,srcWidth,srcHeight
+        return src
     elif( imgAR == wndwAR ):
-        wScale = resolution[0]/srcWidth
-        hScale = resolution[1]/srcHeight 
-        return 0,0,wScale,hScale
-    elif:
+        wScale = float(resolution[0])/srcWidth
+        hScale = float(resolution[1])/srcHeight 
+        return src.scale_simple(resolution[0],resolution[1],gdk.INTERP_BILINEAR)
+    else:
         #scale factors
 
         wscale = (float(srcWidth)/float(resolution[0]))
@@ -39,47 +44,97 @@ def smartScale(src, resolution):
             hscale=1.0-hscale
         if( wscale == 0 ): #if we can get away with not scaling do that
             targetx = 0
-            targety = (resolution[1]-self.height)/2
+            targety = (resolution[1]-srcHeight)/2
             targetw = srcWidth
             targeth = srcHeight
         elif( hscale == 0 ): #if we can get away with not scaling do that
-            targetx = (resolution[0]-img.width)/2
+            targetx = (resolution[0]-srcWidth)/2
             targety = 0
-            targetw = img.width
-            targeth = img.height
+            targetw = srcWidth
+            targeth = srcHeight
         elif(wscale < hscale): # the width has less distortion
-            sfactor = float(resolution[0])/float(self.width)
-            targetw = int(float(self.width)*sfactor)
-            targeth = int(float(self.height)*sfactor)
+            sfactor = float(resolution[0])/float(srcWidth)
+            targetw = int(float(srcWidth)*sfactor)
+            targeth = int(float(srcHeight)*sfactor)
             if( targetw > resolution[0] or targeth > resolution[1]):
                 #aw shucks that still didn't work do the other way instead
-                sfactor = float(resolution[1])/float(self.height)
-                targetw = int(float(self.width)*sfactor)
-                targeth = int(float(self.height)*sfactor)
+                sfactor = float(resolution[1])/float(srcHeight)
+                targetw = int(float(srcWidth)*sfactor)
+                targeth = int(float(srcHeight)*sfactor)
                 targetx = (resolution[0]-targetw)/2
                 targety = 0
             else:
                 targetx = 0
                 targety = (resolution[1]-targeth)/2
-            img = img.scale(targetw,targeth)
-        else: #the height has more distortion
-            sfactor = float(resolution[1])/float(self.height)
-            targetw = int(float(self.width)*sfactor)
-            targeth = int(float(self.height)*sfactor)
-            if( targetw > resolution[0] or targeth > resolution[1]):
-                #aw shucks that still didn't work do the other way instead
-                sfactor = float(resolution[0])/float(self.width)
-                targetw = int(float(self.width)*sfactor)
-                targeth = int(float(self.height)*sfactor)
-                targetx = 0
-                targety = (resolution[1]-targeth)/2
-            else:
-                targetx = (resolution[0]-targetw)/2
-                targety = 0
-    wScale = targetw/srcWidth
-    hScale = targeth/srcHeight
-    return targetx,targety,wScale,hScale
 
+        else: #the height has more distortion
+            sfactor = float(resolution[1])/float(srcHeight)
+            targetw = int(float(srcWidth)*sfactor)
+            targeth = int(float(srcHeight)*sfactor)
+            if( targetw > resolution[0] or targeth > resolution[1]):
+                #aw shucks that still didn't work do the other way instead
+                sfactor = float(resolution[0])/float(srcWidth)
+                targetw = int(float(srcWidth)*sfactor)
+                targeth = int(float(srcHeight)*sfactor)
+                targetx = 0
+                targety = (resolution[1]-targeth)/2
+            else:
+                targetx = (resolution[0]-targetw)/2
+
+    return src.scale_simple(targetw,targeth,gdk.INTERP_BILINEAR)
+
+
+def smartCrop(gdk,src,resolution):
+    srcWidth = src.get_width()
+    srcHeight = src.get_height()
+    srcSize = srcWidth,srcHeight
+
+    wndwAR = float(resolution[0])/float(resolution[1])
+    imgAR = float(srcWidth)/float(srcHeight)
+
+    targetx = 0
+    targety = 0
+    targetw = resolution[0]
+    targeth = resolution[1]
+    x,y = None,None
+    if(srcWidth <= resolution[0] and srcHeight <= resolution[1] ): # center a too small image
+        #we're too small just center the thing
+        targetx = (resolution[0]/2)-(srcWidth/2)
+        targety = (resolution[1]/2)-(srcHeight/2)
+        targeth = srcHeight
+        targetw = srcWidth
+        x,y = 0,0
+    elif(srcWidth > resolution[0] and srcHeight > resolution[1]): #crop too big on both axes
+        targetw = resolution[0]
+        targeth = resolution[1]
+        targetx = 0
+        targety = 0
+        x = (srcWidth-resolution[0])/2
+        y = (srcHeight-resolution[1])/2
+
+    elif( srcWidth <= resolution[0] and srcHeight > resolution[1]): #height too big
+        #crop along the y dimension and center along the x dimension
+        targetw = srcWidth
+        targeth = resolution[1]
+        targetx = (resolution[0]-srcWidth)/2
+        targety = 0
+        x = 0
+        y = (srcHeight-resolution[1])/2
+
+    elif( srcWidth > resolution[0] and srcHeight <= resolution[1]): #width too big
+        #crop along the y dimension and center along the x dimension
+        targetw = resolution[0]
+        targeth = srcHeight
+        targetx = 0
+        targety = (resolution[1]-srcHeight)/2
+        x = (srcWidth-resolution[0])/2
+        y = 0
+    
+    dst = gdk.Pixbuf(gdk.COLORSPACE_RGB, False, 8, targetw, targeth)
+    src.copy_area(x, y, targetw, targeth, dst, 0, 0)
+
+    return dst
+    
 
 class GtkWorker(Process):
     """
@@ -129,9 +184,14 @@ class GtkWorker(Process):
         
         if(self.type_ == DisplayBase.FULLSCREEN):
             self.window.fullscreen()
-        else:
+        elif(self.type_ == DisplayBase.FIXED):
             self.drawingArea.set_size_request(*self.size)
             self.window.set_resizable(False)
+        elif(self.type_ == DisplayBase.DEFAULT):
+            #self.drawingArea.set_size_request(*self.size)
+            self.eventBox.set_default_size(100,100)
+        else:
+            pass
 
         self.window.set_title(self.title)
         self.window.show_all()
@@ -186,9 +246,9 @@ class GtkWorker(Process):
 
         self.imageData = data
         self.drawingArea.queue_draw()
-
         if(self.type_ == DisplayBase.DEFAULT):
-            self.drawingArea.set_size_request(data['width'],data['height'])
+            pass
+            #self.drawingArea.set_size_request(data['width'],data['height'])
         elif(self.type_ == DisplayBase.FIXED):
             pass
 
@@ -334,8 +394,25 @@ class GtkWorker(Process):
         data = self.imageData
         if(self.imageData != None ):
             pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
+            
+            
+            areaWidth = self.drawingArea.get_allocation().width
+            areaHeight = self.drawingArea.get_allocation().height
+            
+            if(self.fit == DisplayBase.CROP):
+                pix = smartCrop(self.gtk.gdk,pix,(areaWidth,areaHeight))
+            elif(self.fit == DisplayBase.RESIZE):
+                pix = smartScale(self.gtk.gdk,pix,(areaWidth,areaHeight))
+            else:
+                pass
+                
+
+
             cr = widget.window.cairo_create()
-            cr.set_source_pixbuf(pix,0,0)
+
+                
+            offx,offy = getCentreOffset((areaWidth,areaHeight), (pix.get_width(),pix.get_height()))
+            cr.set_source_pixbuf(pix,offx,offy)
             cr.paint()
 
         #img = Image('lenna')
