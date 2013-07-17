@@ -160,14 +160,42 @@ class GtkWorker(Process):
         if event.button == 3:
             self._rightMouseUpPos = (event.x,event.y)
 
+    def _clamp(self,pos):
+        pos = list(pos)
+        if pos[0] < 0:
+            pos[0] = 0
+        elif pos[0] > self.image.get_allocation().width:
+            pos[0] = self.image.get_allocation().width
+        if pos[1] < 0:
+            pos[1] = 0
+        elif pos[1] > self.image.get_allocation().height:
+            pos[1] = self.image.get_allocation().height
+        return tuple(pos)
+
     def handle_leftButtonDownPosition(self, data):
-        self.connection.send((self._leftMouseDownPos,))
+        if self._leftMouseDownPos is not None:
+            p = self._clamp(self._leftMouseDownPos)
+        else:
+            p = None
+        self.connection.send((p,))
 
     def handle_rightButtonDownPosition(self, data):
-        self.connection.send((self._rightMouseDownPos,))
+        if self._rightMouseDownPos is not None:
+            p = self._clamp(self._rightMouseDownPos)
+        else:
+            p = None
+        self.connection.send((p,))
 
     def handle_leftButtonUpPosition(self,data):
-        self.connection.send((self._leftMouseUpPos,))
+        if self._leftMouseUpPos is not None:
+            p = self._clamp(self._leftMouseUpPos)
+        else:
+            p = None
+        self.connection.send((p,))
 
     def handle_rightButtonUpPosition(self,data):
-        self.connection.send((self._rightMouseUpPos,))
+        if self._rightMouseUpPos is not None:
+            p = self._clamp(self._rightMouseUpPos)
+        else:
+            p = None
+        self.connection.send((p,))
