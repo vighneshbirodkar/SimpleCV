@@ -3,6 +3,83 @@ import os
 from ..Base import DisplayBase
 
 
+#returns x,y,xScale,yScale
+#copied from adaptiveScale in ImageClass
+def smartScale(src, resolution):
+    srcWidth = src.get_width()
+    srcHeight = src.get_height()
+    srcSize = srcWidth,srcHeight
+
+    wndwAR = float(resolution[0])/float(resolution[1])
+    imgAR = float(srcWidth)/float(srcHeight)
+
+    targetx = 0
+    targety = 0
+    targetw = resolution[0]
+    targeth = resolution[1]
+
+    if( srcSize == resolution): # we have to resize
+        return 0,0,srcWidth,srcHeight
+    elif( imgAR == wndwAR ):
+        wScale = resolution[0]/srcWidth
+        hScale = resolution[1]/srcHeight 
+        return 0,0,wScale,hScale
+    elif:
+        #scale factors
+
+        wscale = (float(srcWidth)/float(resolution[0]))
+        hscale = (float(srcHeight)/float(resolution[1]))
+        if(wscale>1): #we're shrinking what is the percent reduction
+            wscale=1-(1.0/wscale)
+        else: # we need to grow the image by a percentage
+            wscale = 1.0-wscale
+        if(hscale>1):
+            hscale=1-(1.0/hscale)
+        else:
+            hscale=1.0-hscale
+        if( wscale == 0 ): #if we can get away with not scaling do that
+            targetx = 0
+            targety = (resolution[1]-self.height)/2
+            targetw = srcWidth
+            targeth = srcHeight
+        elif( hscale == 0 ): #if we can get away with not scaling do that
+            targetx = (resolution[0]-img.width)/2
+            targety = 0
+            targetw = img.width
+            targeth = img.height
+        elif(wscale < hscale): # the width has less distortion
+            sfactor = float(resolution[0])/float(self.width)
+            targetw = int(float(self.width)*sfactor)
+            targeth = int(float(self.height)*sfactor)
+            if( targetw > resolution[0] or targeth > resolution[1]):
+                #aw shucks that still didn't work do the other way instead
+                sfactor = float(resolution[1])/float(self.height)
+                targetw = int(float(self.width)*sfactor)
+                targeth = int(float(self.height)*sfactor)
+                targetx = (resolution[0]-targetw)/2
+                targety = 0
+            else:
+                targetx = 0
+                targety = (resolution[1]-targeth)/2
+            img = img.scale(targetw,targeth)
+        else: #the height has more distortion
+            sfactor = float(resolution[1])/float(self.height)
+            targetw = int(float(self.width)*sfactor)
+            targeth = int(float(self.height)*sfactor)
+            if( targetw > resolution[0] or targeth > resolution[1]):
+                #aw shucks that still didn't work do the other way instead
+                sfactor = float(resolution[0])/float(self.width)
+                targetw = int(float(self.width)*sfactor)
+                targeth = int(float(self.height)*sfactor)
+                targetx = 0
+                targety = (resolution[1]-targeth)/2
+            else:
+                targetx = (resolution[0]-targetw)/2
+                targety = 0
+    wScale = targetw/srcWidth
+    hScale = targeth/srcHeight
+    return targetx,targety,wScale,hScale
+
 
 class GtkWorker(Process):
     """
