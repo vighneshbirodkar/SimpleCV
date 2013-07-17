@@ -1,4 +1,5 @@
 # Load required libraries
+from DisplayNew import DrawingLayer
 from SimpleCV.base import *
 from SimpleCV.Color import *
 from SimpleCV.LineScan import *
@@ -14458,5 +14459,4 @@ from SimpleCV.Features import FeatureSet, Feature, Barcode, Corner, HaarFeature,
 from SimpleCV.Tracking import camshiftTracker, lkTracker, surfTracker, mfTracker, TrackSet
 from SimpleCV.Stream import JpegStreamer
 from SimpleCV.Font import *
-from SimpleCV.DrawingLayer import *
 from SimpleCV.DFT import DFT

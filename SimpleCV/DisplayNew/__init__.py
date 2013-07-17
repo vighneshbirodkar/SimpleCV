@@ -1,4 +1,5 @@
 
 from Gtk.Display import GtkDisplay
-__all__ = ['GtkDisplay']
+from Base.DrawingLayer import DrawingLayer
+__all__ = ['GtkDisplay','DrawingLayer']
 

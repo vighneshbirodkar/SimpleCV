@@ -1,11 +1,22 @@
 
 from ..Base import DisplayBase
+from ..Base import Line
 from ..Base import DisplayNotFoundException
 from Worker import GtkWorker
 from multiprocessing import Pipe
 
 
 class GtkDisplay(DisplayBase):
+    """
+    A Display for SimpleCV using Gtk back-end. Each GtkDisplay spawns a GtkWorker,
+    which is a seperate process do display images passed to it. GtkDisplay itself
+    doesn't do gtk calls. It send messages to the Worker to tell it what to do
+    
+    Images may have non-empty Drawing layers. Each layer may have shapes.
+    These are communicated to the GtkWorker via the send_* calls
+    eg. A Line is handled by the send_Line call.
+    
+    """
     
     def name(self):
         return "GtkDisplay"
@@ -85,6 +96,10 @@ class GtkDisplay(DisplayBase):
             self.connection.send(dic)
         else:
             raise DisplayNotFoundException(self)
+            
+        for layer in img.layers():
+            for shape in layer.shapes():
+                self.connection.send(shape)
 
     @property
     def mouseX(self):
@@ -129,4 +144,4 @@ class GtkDisplay(DisplayBase):
             dic['function'] = 'rightButtonUpPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
-
+       

@@ -24,6 +24,7 @@ class GtkWorker(Process):
         self.fit = fit
         self.title = title
         self.type_ = type_
+        self.cairoContext = None
         Process.__init__(self)
    
     def run(self):
@@ -92,16 +93,18 @@ class GtkWorker(Process):
         
         #examine the message and figure out what to do with it
         msg = self.connection.recv()
-        
-        funcName = "handle_" + msg['function']
-        funcToCall = self.__getattribute__(funcName)
-        funcToCall(msg) 
+        if(type(msg) is dict):
+            funcName = "handle_" + msg['function']
+            funcToCall = self.__getattribute__(funcName)
+            funcToCall(msg)
+        else:
+            self.drawShape(msg) 
             
     def handle_showImage(self,data):
         #show image from string
         pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
 
-
+        self.cairoContext = self.image.window.cairo_create()
         self.image.set_from_pixbuf(pix)
         
         if(self.type_ == DisplayBase.DEFAULT):
@@ -203,3 +206,6 @@ class GtkWorker(Process):
             p = None
         self.connection.send((p,))
         self._rightMouseUpPos = None
+        
+    def drawShape(self,shape):
+        print shape

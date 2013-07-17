@@ -1,6 +1,6 @@
 from SimpleCV.base import *
 from SimpleCV.ImageClass import Image, ImageSet
-from SimpleCV.DrawingLayer import *
+from ..DisplayNew.Base import DrawingLayer
 from SimpleCV.Features import FeatureExtractorBase
 """
 This class is encapsulates almost everything needed to train, test, and deploy a

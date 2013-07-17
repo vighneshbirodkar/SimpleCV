@@ -1,57 +1,52 @@
-from abc import ABCMeta,abstractmethod
-from shapes import *
+from Shapes import *
+from ...Color import Color
 
 
-class DrawingLayerBase:
+class DrawingLayer:
     
-    __metaclass__ = ABCMeta
     """
     DrawingLayer gives you a way to mark up Image classes without changing
     the image data itself.
     """
-    _defaultColor = 0
-    _fontColor = 0
-    _clearColor = 0
-    _font = 0
-    _fontName = ""
-    _fontSize = 0
-    _defaultAlpha = 255
-    width = 0
-    height = 0
-    _shapes = []
+
+    
 
     #TODO
     #include buffers for alpha related stuff
     #look into anti aliasing in gtk
     def __repr__(self):
-        return "<SimpleCV %s resolution:(%s), Image Resolution: (%d, %d) at memory location: (%s)>" % (self.name(),self.size, self.imgSize[0], self.imgSize[1], hex(id(self)))
+        return "<SimpleCV %s  Image Resolution: (%d, %d) at memory location: (%s)>" % (self.name(), self.imgSize[0], self.imgSize[1], hex(id(self)))
 
-    @abstractmethod
     def __init__(self, (width,height)) :
         """
         Sets all buffers
         """
-        selg.imgSize = (width,height)
+        self.imgSize = (width,height)
+        self.bold = False
+        self.italic = False
+        self.underlined = False
+        self.font = "Georgia"
+        self.fontSize = 20
+        self._shapes = []
 
-    @abstractmethod
     def name(self):
-        pass
+        return "DrawingLayer"
         
 
-    @abstractproperty
     def getDefaultAlpha(self):
         """
         Returns the default alpha value.
         """
+        #TODO I dont think this is really needed
+        pass
 
-    @abstractproperty
     def setLayerAlpha(self, alpha):
         """
         This method sets the alpha value of the entire layer in a single
         pass. This is helpful for merging layers with transparency.
         """
+        self.alpha = alpha
 
-    @abstractproperty
     def setDefaultColor(self, color):
         """
         This method sets the default rendering color.
@@ -59,8 +54,9 @@ class DrawingLayerBase:
         Parameters:
             color - Color object or Color Tuple
         """
+        pass
+        #TODO may not be required
 
-    @abstractmethod
     def line(self, start, stop, color = Color.DEFAULT, width = 1, antialias = True, alpha = -1 ):
         """
         Draw a single line from the (x,y) tuple start to the (x,y) tuple stop.
@@ -77,10 +73,8 @@ class DrawingLayerBase:
         antialias - Draw an antialiased object of width one.
 
         """
-        _shapes.append(Line(start,stop,color,width,antialias,alpha))
+        self._shapes.append(Line(start,stop,color,width,antialias,alpha))
 
-
-    @abstractmethod
     def lines(self, points, color = Color.DEFAULT, antialias = True, alpha = -1, width = 1 ):
         """
         Draw a set of lines from the list of (x,y) tuples points. Lines are draw
@@ -102,7 +96,6 @@ class DrawingLayerBase:
         for i in range(len(points)-1):
         	line(points[i],points[i+1],color,width,antialias,alpha)
 
-    @abstractmethod
     def rectangle(self, topLeft, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
         """
         Draw a rectangle given the topLeft the (x,y) coordinate of the top left
@@ -124,7 +117,6 @@ class DrawingLayerBase:
         p1 = (topLeft[0]+dimensions[0],topLeft[1]+dimensions[1])
         rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
 
-    @abstractmethod
     def rectangle2pts(self, pt0, pt1, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
         """
         Draw a rectangle given two (x,y) points
@@ -143,7 +135,6 @@ class DrawingLayerBase:
         """
         _shapes.append(Rectangle(pt1,pt2,color,width,filled,antialias,alpha))
 
-    @abstractmethod
     def centeredRectangle(self, center, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
         """
         Draw a rectangle given the center (x,y) of the rectangle and dimensions (width, height)
@@ -164,7 +155,6 @@ class DrawingLayerBase:
         p1 = (center[0]+dimensions[0]/2.0,center[1]+dimensions[1]/2.0)
         rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
 
-    @abstractmethod
     def polygon(self, points, color = Color.DEFAULT, antialias = True, width = 1, filled = False, alpha = -1):
         """
         Draw a polygon from a list of (x,y)
@@ -185,7 +175,6 @@ class DrawingLayerBase:
         """
         _shapes.append(Polygon(points,color,width,filled,antialias,alpha))
 
-    @abstractmethod
     def circle(self, center, radius, color = Color.DEFAULT, antialias = True, width = 1, filled = False, alpha = -1):
         """
         Draw a circle given a location and a radius.
@@ -205,7 +194,6 @@ class DrawingLayerBase:
         """
         _shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
 
-    @abstractmethod
     def ellipse(self, center, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1):
         """
         Draw an ellipse given a location and a dimensions.
@@ -226,7 +214,6 @@ class DrawingLayerBase:
         _shapes.append(Ellipse(center,dimensions,color,width,filled,antialias,alpha))
        
 
-    @abstractmethod
     def bezier(self, points, steps, color = Color.DEFAULT,antialias = True, alpha = -1):
         """
         Draw a bezier curve based on a control point and the a number of steps
@@ -242,7 +229,6 @@ class DrawingLayerBase:
         """
         _shapes.append(Bezier(points,steps,color,width,antialias,alpha))
     
-    @abstractmethod
     def text(self, text, location, color = Color.DEFAULT, alpha = -1):
         """
         Write the a text string at a given location
@@ -258,41 +244,44 @@ class DrawingLayerBase:
                 means transparent.
 
         """
+        #TODO the docs
+        _shapes.append(Text(text,location,self.fontName,self.fontSize,self.bold,self.italic,self.underline,antialias,alpha))
     
-    @abstractmethod
     def setFontBold(self, doBold):
         """
         This method sets and unsets the current font to be bold.
         """
+        self.bold = doBold
         
-    @abstractmethod
+        
     def setFontItalic(self, doItalic):
         """
         This method sets and unsets the current font to be italic.
         """
+        self.italic = True
         
-    @abstractmethod
     def setFontUnderline(self, doUnderline):
         """
         This method sets and unsets the current font to be underlined
         """
+        self.underline = doUnderline
        
-    @abstractmethod
     def selectFont(self, fontName):
         """
         This method attempts to set the font from a font file. It is advisable
         to use one of the fonts listed by the listFonts() method. The input
         is a string with the font name.
         """
+        self.font = fontName
         
-    @abstractmethod
+    @classmethod
     def listFonts(self):
         """
         This method returns a list of strings corresponding to the fonts available
         on the current system.
         """
+        pass
 
-    @abstractmethod
     def setFontSize(self, sz):
         """
         This method sets the font size roughly in points. A size of 10 is almost
@@ -301,8 +290,8 @@ class DrawingLayerBase:
         Parameters:
             sz = Int
         """
+        self.fontSize = sz
 
-    @abstractmethod
     def sprite(self,img,pos=(0,0),scale=1.0,rot=0.0,alpha=255):
         """
         sprite draws a sprite (a second small image) onto the current layer.
@@ -317,9 +306,9 @@ class DrawingLayerBase:
 
         alpha = an alpha value 255=opaque 0=transparent.
         """
+        pass
 
 
-    @abstractmethod
     def blit(self, img, coordinates = (0,0)):
         """
         Blit one image onto the drawing layer at upper left coordinates
@@ -329,10 +318,14 @@ class DrawingLayerBase:
             coordinates - Tuple
 
         """
+        pass
 
-    @abstractmethod
+    def shapes(self):
+        return self._shapes
     def clear(self):
         """
         This method removes all of the drawing on this layer (i.e. the layer is
         erased completely)
         """
+        self._shapes = []
+    #TODO ezview text
