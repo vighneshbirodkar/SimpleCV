@@ -68,7 +68,7 @@ class GtkDisplay(DisplayBase):
             if(self.fit == DisplayBase.RESIZE):
                 img = img.adaptiveScale(self.getImageWidgetSize(),True)
             elif(self.fit == DisplayBase.CROP):
-                img = img.adaptiveScale(self.getImageWidgetSize(),False)
+                img = img.adaptiveScale(sself.getImageWidgetSize(),False)
             else:
                 #TODO raise an exception here maybe, cause many other functions
                 #may get a value they are not expecting
@@ -101,7 +101,32 @@ class GtkDisplay(DisplayBase):
             dic['function'] = 'mouseY'
             self.connection.send(dic)
             return self.connection.recv()[0]
-        
-    
-            
+
+    def leftButtonDownPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'leftButtonDownPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def rightButtonDownPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'rightButtonDownPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def leftButtonUpPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'leftButtonUpPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def rightButtonUpPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'rightButtonUpPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
 

@@ -13,7 +13,7 @@ class GtkWorker(Process):
     Each GUI function (*) in GtkDisplay has a corresponding handle_* method in
     GtkWorker . 
     
-    eg. GtkDisplay.showImage() correspons to GtkWorker.handle_showImage()
+    eg. GtkDisplay.showImage() corresponds to GtkWorker.handle_showImage()
     
     
     """
@@ -43,6 +43,10 @@ class GtkWorker(Process):
         
         self.window = builder.get_object("window")
         self.image = builder.get_object("image")
+        self.eventBox = builder.get_object("eventbox")
+        self.eventBox.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
+        self.eventBox.connect("button_press_event", self.mouse_press)
+        self.eventBox.connect("button_release_event", self.mouse_release)
         
         if(self.type_ == DisplayBase.FULLSCREEN):
             self.window.fullscreen()
@@ -57,7 +61,13 @@ class GtkWorker(Process):
         self._winWidth, self._winHeight = self.window.get_size()
         self._mouseX = None
         self._mouseY = None
-        
+
+        self._leftMouseDownPos = None
+        self._rightMouseDownPos = None
+        self._leftMouseUpPos = None
+        self._rightMouseUpPos = None
+
+       
         #calls pollMsg when gtk is idle
         gobject.idle_add(self.pollMsg,None)
 
@@ -131,9 +141,33 @@ class GtkWorker(Process):
         self.connection.send((self._mouseX,))
 
     def handle_mouseY(self,data):
-    	self._mouseY = self.image.get_pointer() [1]
+        self._mouseY = self.image.get_pointer() [1]
         if self._mouseY < 0:
             self._mouseY = 0
         if self._mouseY > self.image.get_allocation().height:
             self._mouseY = self.image.get_allocation().height
         self.connection.send((self._mouseY,))
+
+    def mouse_press(self,widget,event):
+        if event.button == 1 :
+            self._leftMouseDownPos = (event.x,event.y)
+        if event.button == 3:
+            self._rightMouseDownPos = (event.x,event.y)
+
+    def mouse_release(self,widget,event):
+        if event.button == 1 :
+            self._leftMouseUpPos = (event.x,event.y)
+        if event.button == 3:
+            self._rightMouseUpPos = (event.x,event.y)
+
+    def handle_leftButtonDownPosition(self, data):
+        self.connection.send((self._leftMouseDownPos,))
+
+    def handle_rightButtonDownPosition(self, data):
+        self.connection.send((self._rightMouseDownPos,))
+
+    def handle_leftButtonUpPosition(self,data):
+        self.connection.send((self._leftMouseUpPos,))
+
+    def handle_rightButtonUpPosition(self,data):
+        self.connection.send((self._rightMouseUpPos,))
