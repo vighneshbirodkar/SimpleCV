@@ -189,7 +189,7 @@ class GtkWorker(Process):
             self.window.set_resizable(False)
         elif(self.type_ == DisplayBase.DEFAULT):
             #self.drawingArea.set_size_request(*self.size)
-            self.eventBox.set_default_size(100,100)
+            self.drawingArea.set_size_request(*self.size)
         else:
             pass
 
@@ -247,8 +247,7 @@ class GtkWorker(Process):
         self.imageData = data
         self.drawingArea.queue_draw()
         if(self.type_ == DisplayBase.DEFAULT):
-            pass
-            #self.drawingArea.set_size_request(data['width'],data['height'])
+            self.drawingArea.set_size_request(data['width'],data['height'])
         elif(self.type_ == DisplayBase.FIXED):
             pass
 
@@ -391,6 +390,8 @@ class GtkWorker(Process):
         self._scrollDir = None
 
     def draw(self,widget,eventData = None):
+        if(self.type_ == DisplayBase.DEFAULT):
+            self.drawingArea.set_size_request(10,10)
         data = self.imageData
         if(self.imageData != None ):
             pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
