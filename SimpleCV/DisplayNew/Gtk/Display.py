@@ -130,3 +130,18 @@ class GtkDisplay(DisplayBase):
             self.connection.send(dic)
             return self.connection.recv()[0]
 
+    def middleButtonDownPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'middleButtonDownPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def middleButtonUpPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'middleButtonUpPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+

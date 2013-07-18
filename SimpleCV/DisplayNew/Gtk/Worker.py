@@ -45,8 +45,6 @@ class GtkWorker(Process):
         self.image = builder.get_object("image")
         self.eventBox = builder.get_object("eventbox")
         self.eventBox.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
-        self.eventBox.connect("button_press_event", self.mouse_press)
-        self.eventBox.connect("button_release_event", self.mouse_release)
         
         if(self.type_ == DisplayBase.FULLSCREEN):
             self.window.fullscreen()
@@ -66,8 +64,9 @@ class GtkWorker(Process):
         self._rightMouseDownPos = None
         self._leftMouseUpPos = None
         self._rightMouseUpPos = None
+        self._middleMouseDownPos = None
+        self._middleMouseUpPos = None
 
-       
         #calls pollMsg when gtk is idle
         gobject.idle_add(self.pollMsg,None)
 
@@ -151,12 +150,16 @@ class GtkWorker(Process):
     def mouse_press(self,widget,event):
         if event.button == 1 :
             self._leftMouseDownPos = (event.x,event.y)
+        if event.button == 2 :
+            self._middleMouseDownPos = (event.x,event.y)
         if event.button == 3:
             self._rightMouseDownPos = (event.x,event.y)
 
     def mouse_release(self,widget,event):
         if event.button == 1 :
             self._leftMouseUpPos = (event.x,event.y)
+        if event.button == 2 :
+            self._middleMouseUpPos = (event.x,event.y)
         if event.button == 3:
             self._rightMouseUpPos = (event.x,event.y)
 
@@ -203,3 +206,20 @@ class GtkWorker(Process):
             p = None
         self.connection.send((p,))
         self._rightMouseUpPos = None
+
+    def handle_middleButtonDownPosition(self,data):
+        if self._middleMouseDownPos is not None:
+            p = self._clamp(self._middleMouseDownPos)
+        else:
+            p = None
+        self.connection.send((p,))
+        self._middleMouseDownPos = None
+
+    def handle_middleButtonUpPosition(self,data):
+        if self._middleMouseUpPos is not None:
+            p = self._clamp(self._middleMouseUpPos)
+        else:
+            p = None
+        self.connection.send((p,))
+        self._middleMouseUpPos = None
+
