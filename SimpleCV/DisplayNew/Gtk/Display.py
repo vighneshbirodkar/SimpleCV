@@ -144,4 +144,18 @@ class GtkDisplay(DisplayBase):
             self.connection.send(dic)
             return self.connection.recv()[0]
 
+    def mouseScrollPosition(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mouseScrollPosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    def mouseScrollType(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mouseScrollType'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
 
