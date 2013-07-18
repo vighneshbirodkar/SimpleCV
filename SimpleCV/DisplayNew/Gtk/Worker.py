@@ -66,6 +66,8 @@ class GtkWorker(Process):
         self._rightMouseUpPos = None
         self._middleMouseDownPos = None
         self._middleMouseUpPos = None
+        self._scrollPos = None
+        self._scrollDir = None
 
         #calls pollMsg when gtk is idle
         gobject.idle_add(self.pollMsg,None)
@@ -163,6 +165,13 @@ class GtkWorker(Process):
         if event.button == 3:
             self._rightMouseUpPos = (event.x,event.y)
 
+    def mouse_scroll(self,widget,event):
+        self._scrollPos = (event.x,event.y)
+        if str(event.direction) == '<enum GDK_SCROLL_UP of type GdkScrollDirection>':
+            self._scrollDir = 'up'
+        elif str(event.direction) == '<enum GDK_SCROLL_DOWN of type GdkScrollDirection>':
+            self._scrollDir = 'down'
+
     def _clamp(self,pos):
         pos = list(pos)
         if pos[0] < 0:
@@ -222,4 +231,17 @@ class GtkWorker(Process):
             p = None
         self.connection.send((p,))
         self._middleMouseUpPos = None
+
+    def handle_mouseScrollPosition(self,data):
+        if self._scrollPos is not None:
+            p = self._clamp(self._scrollPos)
+        else:
+            p = None
+        self.connection.send((p,))
+        self._scrollPos = None
+
+    def handle_mouseScrollType(self,data):
+        self.connection.send((self._scrollDir,))
+        self._scrollDir = None
+
 
