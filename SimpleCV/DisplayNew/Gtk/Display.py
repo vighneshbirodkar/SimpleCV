@@ -65,28 +65,7 @@ class GtkDisplay(DisplayBase):
     
     def showImage(self,img):
         self._checkIfWorkerDead()
-        
-#        if(self.type_ == DisplayBase.FIXED ):
-#            if(self.fit == DisplayBase.RESIZE):
-#                img = img.adaptiveScale(self.size,True)
-#            elif(self.fit == DisplayBase.CROP):
-#                img = img.adaptiveScale(self.size,False)
-#            else:
-#                #TODO raise an exception here maybe, cause many other functions
-#                #may get a value they are not expecting
-#                pass
-#        elif(self.type_ == DisplayBase.FULLSCREEN):
-#            if(self.fit == DisplayBase.RESIZE):
-#                img = img.adaptiveScale(self.getImageWidgetSize(),True)
-#            elif(self.fit == DisplayBase.CROP):
-#                img = img.adaptiveScale(self.getImageWidgetSize(),False)
-#            else:
-#                #TODO raise an exception here maybe, cause many other functions
-#                #may get a value they are not expecting
-#                pass
-#        
-            
-        
+               
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'showImage'
@@ -94,13 +73,13 @@ class GtkDisplay(DisplayBase):
             dic['depth'] = img.depth
             dic['width'] = img.width
             dic['height'] = img.height
+            dic['layers'] = img.layers()
             self.connection.send(dic)
+            
         else:
             raise DisplayNotFoundException(self)
             
-        for layer in img.layers():
-            for shape in layer.shapes():
-                self.connection.send(shape)
+
 
     @property
     def mouseX(self):

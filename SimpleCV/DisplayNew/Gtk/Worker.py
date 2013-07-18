@@ -1,6 +1,7 @@
 from multiprocessing import Process,Pipe
 import os
 from ..Base import DisplayBase
+from ..Base import Line
 
 
 def getCentreOffset(box1,box2):
@@ -22,7 +23,7 @@ def smartScale(gdk, src, resolution):
     targety = 0
     targetw = resolution[0]
     targeth = resolution[1]
-    print srcHeight
+
     if( srcSize == resolution): # we have to resize
         return src
     elif( imgAR == wndwAR ):
@@ -150,6 +151,7 @@ class GtkWorker(Process):
     
     """
     _gladeFile = "main.glade"
+    BGCOLOR = (.5,.5,1.0)
     def __init__(self,connection,size,type_,title,fit):
         self.connection = connection
         self.size = size
@@ -181,6 +183,21 @@ class GtkWorker(Process):
         
         #when an image arrives, its data is stored here
         self.imageData = None
+        
+        #the pixbuf used to load image
+        self.pixbuf = None
+        
+        #the real size of image being displayed originally
+        self.imgRealSize = None
+        
+        #the size of the image, as it appears on the screen
+        self.imgDisplaySize = None
+        
+        #the x and y scale
+        self.scale = None
+        
+        #the offset from the drawing layer at which image is drawn
+        self.offset = None
         
         if(self.type_ == DisplayBase.FULLSCREEN):
             self.window.fullscreen()
@@ -245,7 +262,12 @@ class GtkWorker(Process):
         #show image from string
 
         self.imageData = data
+        self.imgRealSize = (data['width'],data['height'])
+        
+        self.pixbuf =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
+        
         self.drawingArea.queue_draw()
+        
         if(self.type_ == DisplayBase.DEFAULT):
             self.drawingArea.set_size_request(data['width'],data['height'])
         elif(self.type_ == DisplayBase.FIXED):
@@ -356,10 +378,6 @@ class GtkWorker(Process):
             p = None
         self.connection.send((p,))
         self._rightMouseUpPos = None
-    
-    def drawShape(self,shape):
-        #print shape
-        pass
 
     def handle_middleButtonDownPosition(self,data):
         if self._middleMouseDownPos is not None:
@@ -390,36 +408,80 @@ class GtkWorker(Process):
         self._scrollDir = None
 
     def draw(self,widget,eventData = None):
+        if(self.pixbuf == None):
+            return
         if(self.type_ == DisplayBase.DEFAULT):
             self.drawingArea.set_size_request(10,10)
-        data = self.imageData
-        if(self.imageData != None ):
-            pix =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
+
+        areaWidth = self.drawingArea.get_allocation().width
+        areaHeight = self.drawingArea.get_allocation().height
+        
+        if(self.fit == DisplayBase.CROP):
+            pix = smartCrop(self.gtk.gdk,self.pixbuf,(areaWidth,areaHeight))
+        elif(self.fit == DisplayBase.RESIZE):
+            pix = smartScale(self.gtk.gdk,self.pixbuf,(areaWidth,areaHeight))
+        else:
+            pass
             
+        cr = widget.window.cairo_create()
+
+        #cr.scale(areaWidth,areaHeight)    
+        self.imgDisplaySize =  (pix.get_width(),pix.get_height())
+        offx,offy = getCentreOffset((areaWidth,areaHeight),self.imgDisplaySize)
+        self.offset = offx,offy
+        self.scale = float(self.imgDisplaySize[0])/self.imgRealSize[0] , float(self.imgDisplaySize[1])/self.imgRealSize[1]
+        
+        cr.set_source_rgb(*GtkWorker.BGCOLOR) # blue
+        cr.rectangle(0, 0, areaWidth, areaHeight)
+        cr.fill()
+        #TODO optimize
+        tl = self.getTopLeft()
+        wh = self.getCropWH()
+        x,y,w,h = tl[0],tl[1],wh[0],wh[1]
+
+        cr.rectangle(x,y,w,h)
+        #cr.stroke()
+        cr.clip()
+        cr.set_source_pixbuf(pix,offx,offy)
+        cr.paint()
+        cr.translate(*self.getTopLeft())
+        if(self.fit == DisplayBase.CROP):
+            cr.scale(1,1)
+        else:
+            cr.scale(self.scale[0],self.scale[1])
+        self.drawLayers(cr)
+        
+    def drawLayers(self,context):
+        if(self.imageData is None):
+            return
+        layers = self.imageData['layers']
+        for layer in layers:
             
+            for shape in layer.shapes():
+                self.drawShape(context,shape)
+            
+    def drawShape(self,cr,shape):
+        if(type(shape) == Line):
+            r,g,b = shape.color
+            r,g,b = float(r)/255,float(g)/255,float(b)/255
+            a = float(shape.alpha)/255
+            cr.set_source_rgba(r,g,b,a)
+            cr.set_line_width(shape.width)
+            cr.move_to(*shape.start)
+            cr.line_to(*shape.stop)
+            cr.stroke()
+
+    def getTopLeft(self):
+        if(self.fit == DisplayBase.RESIZE):
+            return self.offset
+        elif(self.fit == DisplayBase.CROP):
             areaWidth = self.drawingArea.get_allocation().width
             areaHeight = self.drawingArea.get_allocation().height
-            
-            if(self.fit == DisplayBase.CROP):
-                pix = smartCrop(self.gtk.gdk,pix,(areaWidth,areaHeight))
-            elif(self.fit == DisplayBase.RESIZE):
-                pix = smartScale(self.gtk.gdk,pix,(areaWidth,areaHeight))
-            else:
-                pass
-                
-
-
-            cr = widget.window.cairo_create()
-
-                
-            offx,offy = getCentreOffset((areaWidth,areaHeight), (pix.get_width(),pix.get_height()))
-            cr.set_source_pixbuf(pix,offx,offy)
-            cr.paint()
-
-        #img = Image('lenna')
-        #pix =  self.gtk.gdk.pixbuf_new_from_data(img.toSring(), self.gtk.gdk.COLORSPACE_RGB, False, img.depth,img.width, img.height, img.width*3)
-        
-        
-            
-
+            return areaWidth/2 - self.imgRealSize[0]/2 , areaHeight/2 - self.imgRealSize[1]/2
+    
+    def getCropWH(self):
+        if(self.fit == DisplayBase.RESIZE):
+            return self.imgDisplaySize
+        elif(self.fit == DisplayBase.CROP):
+            return self.imageData['width'],self.imageData['height']
 

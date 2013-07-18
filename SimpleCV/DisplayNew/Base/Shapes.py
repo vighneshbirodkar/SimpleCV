@@ -7,7 +7,7 @@ thse also store color, alpha and other displaying parameters
 """
 
 
-class Line:
+class Line(object):
     def __init__(self,start,stop,color ,width,antialias,alpha):
         self.start = start
         self.stop = stop

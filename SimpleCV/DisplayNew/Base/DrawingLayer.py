@@ -57,7 +57,7 @@ class DrawingLayer:
         pass
         #TODO may not be required
 
-    def line(self, start, stop, color = Color.DEFAULT, width = 1, antialias = True, alpha = -1 ):
+    def line(self, start, stop, color = Color.DEFAULT, width = 1, antialias = True, alpha = 255 ):
         """
         Draw a single line from the (x,y) tuple start to the (x,y) tuple stop.
         Optional parameters:
