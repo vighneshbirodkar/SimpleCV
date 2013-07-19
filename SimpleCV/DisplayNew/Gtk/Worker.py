@@ -178,8 +178,7 @@ class GtkWorker(Process):
         
         self.window = builder.get_object("window")
         self.drawingArea = builder.get_object("drawingArea")
-        self.eventBox = builder.get_object("eventbox")
-        self.eventBox.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
+        self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
         
         #when an image arrives, its data is stored here
         self.imageData = None
