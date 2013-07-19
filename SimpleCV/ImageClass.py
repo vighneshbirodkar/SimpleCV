@@ -1,5 +1,5 @@
 # Load required libraries
-from DisplayNew import DrawingLayer
+import DisplayNew.Base.DrawingLayer
 from SimpleCV.base import *
 from SimpleCV.Color import *
 from SimpleCV.LineScan import *

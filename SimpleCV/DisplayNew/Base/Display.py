@@ -49,7 +49,7 @@ class DisplayBase:
     
     #what to do with a bigger image when display size is fixed
     RESIZE = 0
-    CROP = 1
+    SCROLL = 1
     
     #The last display initialized, to be used for img.show()
     screen = None
