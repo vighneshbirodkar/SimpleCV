@@ -179,6 +179,7 @@ class GtkWorker(Process):
         self.window = builder.get_object("window")
         self.drawingArea = builder.get_object("drawingArea")
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
+        self.drawingArea.connect("expose-event",self.draw)
         
         #when an image arrives, its data is stored here
         self.imageData = None
@@ -346,9 +347,14 @@ class GtkWorker(Process):
             pos[1] = self.drawingArea.get_allocation().height
         return tuple(pos)
 
+    def _mouseOffset(self,pos):
+        diff = self.getTopLeft()
+        return (pos[0]-diff[0],pos[1]-diff[1])
+
+
     def handle_leftButtonDownPosition(self, data):
         if self._leftMouseDownPos is not None:
-            p = self._clamp(self._leftMouseDownPos)
+            p = self._clamp(self._mouseOffset(self._leftMouseDownPos))
         else:
             p = None
         self.connection.send((p,))
@@ -356,7 +362,7 @@ class GtkWorker(Process):
 
     def handle_rightButtonDownPosition(self, data):
         if self._rightMouseDownPos is not None:
-            p = self._clamp(self._rightMouseDownPos)
+            p = self._clamp(self._mouseOffset(self._rightMouseDownPos))
         else:
             p = None
         self.connection.send((p,))
@@ -364,7 +370,7 @@ class GtkWorker(Process):
 
     def handle_leftButtonUpPosition(self,data):
         if self._leftMouseUpPos is not None:
-            p = self._clamp(self._leftMouseUpPos)
+            p = self._clamp(self._mouseOffset(self._leftMouseUpPos))
         else:
             p = None
         self.connection.send((p,))
@@ -372,7 +378,7 @@ class GtkWorker(Process):
 
     def handle_rightButtonUpPosition(self,data):
         if self._rightMouseUpPos is not None:
-            p = self._clamp(self._rightMouseUpPos)
+            p = self._clamp(self._mouseOffset(self._rightMouseUpPos))
         else:
             p = None
         self.connection.send((p,))
@@ -380,7 +386,7 @@ class GtkWorker(Process):
 
     def handle_middleButtonDownPosition(self,data):
         if self._middleMouseDownPos is not None:
-            p = self._clamp(self._middleMouseDownPos)
+            p = self._clamp(self._mouseOffset(self._middleMouseDownPos))
         else:
             p = None
         self.connection.send((p,))
@@ -388,7 +394,7 @@ class GtkWorker(Process):
 
     def handle_middleButtonUpPosition(self,data):
         if self._middleMouseUpPos is not None:
-            p = self._clamp(self._middleMouseUpPos)
+            p = self._clamp(self._mouseOffset(self._middleMouseUpPos))
         else:
             p = None
         self.connection.send((p,))
@@ -396,7 +402,7 @@ class GtkWorker(Process):
 
     def handle_mouseScrollPosition(self,data):
         if self._scrollPos is not None:
-            p = self._clamp(self._scrollPos)
+            p = self._clamp(self._mouseOffset(self._scrollPos))
         else:
             p = None
         self.connection.send((p,))
