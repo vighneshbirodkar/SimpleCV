@@ -20,8 +20,6 @@ class GtkDisplay(DisplayBase):
     
     def name(self):
         return "GtkDisplay"
-        self.worker
-        
         
     def __init__(self,size = (640,480),type_ = DisplayBase.DEFAULT,title = "SimpleCV",fit = DisplayBase.RESIZE):
         DisplayBase.__init__(self,size,type_,title,fit)
