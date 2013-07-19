@@ -65,12 +65,10 @@
           </packing>
         </child>
         <child>
-          <object class="GtkDrawingArea" id="drawingArea">
+          <object class="GtkScrolledWindow" id="scrolledWindow">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <signal name="button-press-event" handler="mouse_press" swapped="no"/>
-            <signal name="button-release-event" handler="mouse_release" swapped="no"/>
-            <signal name="scroll-event" handler="mouse_scroll" swapped="no"/>
+            <property name="can_focus">True</property>
+            <property name="shadow_type">in</property>
           </object>
           <packing>
             <property name="expand">True</property>

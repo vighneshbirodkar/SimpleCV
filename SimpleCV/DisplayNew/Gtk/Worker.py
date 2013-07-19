@@ -153,14 +153,15 @@ class GtkWorker(Process):
     _gladeFile = "main.glade"
     BGCOLOR = (.5,.5,1.0)
     def __init__(self,connection,size,type_,title,fit):
+        Process.__init__(self)
         self.connection = connection
         self.size = size
         self.fit = fit
         self.title = title
         self.type_ = type_
         self.cairoContext = None
-        Process.__init__(self)
-   
+        self.daemon = True
+
     def run(self):
         #Gtk imports have to be done in run, Otherwise Gtk thknks there are
         #multiple copies of itself
@@ -177,9 +178,12 @@ class GtkWorker(Process):
         
         
         self.window = builder.get_object("window")
-        self.drawingArea = builder.get_object("drawingArea")
+        self.scrolledwindow = builder.get_object("scrolledWindow")
+        self.drawingArea = gtk.DrawingArea()
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
         self.drawingArea.connect("expose-event",self.draw)
+        self.scrolledwindow.add_with_viewport(self.drawingArea)
+        self.scrolledwindow.set_policy(gtk.POLICY_NEVER,gtk.POLICY_NEVER)
         
         #when an image arrives, its data is stored here
         self.imageData = None
