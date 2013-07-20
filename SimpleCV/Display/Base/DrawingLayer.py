@@ -62,186 +62,219 @@ class DrawingLayer:
         Draw a single line from the (x,y) tuple start to the (x,y) tuple stop.
         Optional parameters:
 
+        start - The starting point of the line.
+        
+        stop - The ending point of the line.
+
         color - Color object or Color Tuple
+
+        width - The line width in pixels.
+
+        antialias -  Whether of not the edges are antialiased.
 
         alpha - The alpha blending for the object. If this value is -1 then the
                 layer default value is used. A value of 255 means opaque, while 0
                 means transparent.
-
-        width - The line width in pixels.
-
-        antialias - Draw an antialiased object of width one.
 
         """
         self._shapes.append(Line(start,stop,color,width,antialias,alpha))
 
-    def lines(self, points, color = Color.DEFAULT, antialias = True, alpha = -1, width = 1 ):
+    def lines(self, points, color = Color.DEFAULT, width = 1,  antialias = True, alpha = 255):
         """
         Draw a set of lines from the list of (x,y) tuples points. Lines are draw
         between each successive pair of points.
 
-        Optional parameters:
+        points - a sequence of points to draw lines in between.
 
         color - Color object or Color Tuple
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
-
         width - The line width in pixels.
 
-        antialias - Draw an antialiased object of width one.
+        antialias - Whether of not the edges are antialiased.
+
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
 
         """
         for i in range(len(points)-1):
         	line(points[i],points[i+1],color,width,antialias,alpha)
 
-    def rectangle(self, topLeft, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
+    def rectangle(self, topLeft, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
         Draw a rectangle given the topLeft the (x,y) coordinate of the top left
         corner and dimensions (w,h) tge width and height
+        
+        topLeft - The (x,y) coordinates of the top left corner of the rectangle
 
-        color - Color object or Color Tuple
+        dimensions - The (width,height) pf the rectangle
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        filled - Whether or not the rectangle is filled
 
-        width -     The line width in pixels. This does not work if antialiasing is enabled.
+        antialias - Whether of not the edges are antialiased
 
-        filled -The rectangle is filled in
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+
         """
         p0 = topLeft
         p1 = (topLeft[0]+dimensions[0],topLeft[1]+dimensions[1])
         rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
 
-    def rectangle2pts(self, pt0, pt1, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
+    def rectangle2pts(self, pt0, pt1, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
         Draw a rectangle given two (x,y) points
+        
+        pt0 - The top left corner of the rectangle.
+        
+        pt1 - The bottom right corner of the rectangle.
 
-        color - Color object or Color Tuple
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        filled - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        antialias - Whether of not the edges are antialiased
 
-        width -     The line width in pixels. This does not work if antialiasing is enabled.
-
-        filled -The rectangle is filled in
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+                
         """
         _shapes.append(Rectangle(pt1,pt2,color,width,filled,antialias,alpha))
 
-    def centeredRectangle(self, center, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1 ):
+    def centeredRectangle(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
         Draw a rectangle given the center (x,y) of the rectangle and dimensions (width, height)
 
-        color - Color object or Color Tuple
+        center - The (x,y) coordinate of the center of the rectangle
+        
+        dimensions - The (width,height) of the rectangle
+        
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        filled - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        antialias - Whether of not the edges are antialiased
 
-        width -     The line width in pixels. This does not work if antialiasing is enabled.
-
-        filled -The rectangle is filled in
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+    
         """
         p0 = (center[0]-dimensions[0]/2.0,center[1]-dimensions[1]/2.0)
         p1 = (center[0]+dimensions[0]/2.0,center[1]+dimensions[1]/2.0)
         rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
 
-    def polygon(self, points, color = Color.DEFAULT, antialias = True, width = 1, filled = False, alpha = -1):
+    def polygon(self, points, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
         Draw a polygon from a list of (x,y)
 
-        color - Color object or Color Tuple 
+        points - The list of (x,y) coordinates of the vertices of the polygon
+        
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        filled - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        antialias - Whether of not the edges are antialiased
 
-        width - The width in pixels. This does not work if antialiasing is enabled.
-
-        filled -The object is filled in
-
-
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+                
         """
         _shapes.append(Polygon(points,color,width,filled,antialias,alpha))
 
-    def circle(self, center, radius, color = Color.DEFAULT, antialias = True, width = 1, filled = False, alpha = -1):
+    def circle(self, center, radius, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
         Draw a circle given a location and a radius.
+        
+        center - The (x,y) coordinates of the center.
+        
+        radius - The radius of the circle.
 
-        color - Color object or Color Tuple
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        filled - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        antialias - Whether of not the edges are antialiased
 
-        width - The line width in pixels. This does not work if antialiasing is enabled.
-
-        filled -The object is filled in
-
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+                
         """
         _shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
 
-    def ellipse(self, center, dimensions, color = Color.DEFAULT,antialias = True, width = 1, filled = False, alpha = -1):
+    def ellipse(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
         Draw an ellipse given a location and a dimensions.
+        
+        center - The coordinates of the center.
+        
+        dimensions - The length of axes along horizontal and vertical
 
-        color - Color object or Color Tuple
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        filled - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        antialias - Whether of not the edges are antialiased
 
-        width - The line width in pixels. This does not work if antialiasing is enabled.
-
-        filled -The object is filled in
-
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+                
         """
         _shapes.append(Ellipse(center,dimensions,color,width,filled,antialias,alpha))
        
 
-    def bezier(self, points, steps, color = Color.DEFAULT,antialias = True, alpha = -1):
+    def bezier(self, points,  color = Color.DEFAULT,width = 1,antialias = True, alpha = 255 ):
         """
-        Draw a bezier curve based on a control point and the a number of steps
+        Draw a bezier curve based on the control points
 
-        color - Color object or Color Tuple
+        points - Control points . You must specify more than 2 control points        
 
-        antialias - Draw the edges of the object antialiased. Note this does not work when the object is filled.
+        color - Color object or Color Tuple.
+        
+        width -  The width of the edges of the rectangle.
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent
+        antialias - Whether of not the edges are antialiased
+
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
 
         """
         _shapes.append(Bezier(points,steps,color,width,antialias,alpha))
     
-    def text(self, text, location, color = Color.DEFAULT, alpha = -1):
+    def text(self, text, location, color = Color.DEFAULT,font = "",size = 20,bold = False ,italic = True,underline = False,  alpha = 255):
         """
         Write the a text string at a given location
 
         text -  A text string to print.
 
-        location-The location to place the top right corner of the text
+        location - The location to place the top right corner of the text
 
         color - Color object or Color Tuple
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        font - The font to be used. 
+        
+        size - The size of letters.
+        
+        bold - Whether or not text is bold.
+        
+        italic - Whether or not text is italic.
+        
+        underline - Whether or not text is underlined
+
+        alpha - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
 
         """
         #TODO the docs

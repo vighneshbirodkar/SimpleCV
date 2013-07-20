@@ -53,15 +53,21 @@ class Ellipse:
         self.alpha = alpha
 
 class Bezier:
-    def __init__(self, points, steps, color, antialias, alpha ):
+    def __init__(self, points, color, antialias, alpha ):
         self.points = points
-        self.steps = steps
         self.color = color
         self.antialias = antialias
         self.alpha = alpha
         
 class Text:
-    def __init__(self, location,font, size, bold,italic,underline,color,antialias,alpha):
+    def __init__(self, text, location, color ,font ,size, bold ,italic ,underline, alpha)
+        self.text = text
+        self.location = location
+        self.font = font
+        self.size = size
+        self.bold = bold
+        self.italic = italic
+        self.underline = underline
         self.color = color
         self.width = width
         self.antialias = antialias
