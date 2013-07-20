@@ -22,29 +22,42 @@ class GtkDisplay(Display.DisplayBase):
         __doc__ = DisplayBase.name.__doc__
         return "GtkDisplay"
         
-    def __init__(self,size = (640,480),type_ = Display.DEFAULT,title = "SimpleCV",fit = Display.RESIZE):
-        __doc__ = DisplayBase.__init__.__doc__
+    def __init__(self,size = (640,480),type_ = Display.DEFAULT,title = "SimpleCV",fit = Display.SCROLL):
+        
         DisplayBase.__init__(self,size,type_,title,fit)
         parentConnection,childConnnection = Pipe()
-        
         
         self.type_ = type_
         self.fit = fit
         self.imageWidgetSize = None
         
         #Initializing a Worker, A process to handle one display
+        
+        #create and start the worker process
         self.worker = GtkWorker(childConnnection,size,type_,title,fit)
         self.connection = parentConnection
         self.worker.start()
+        
+        #whether or not the chil process is alive
         self.workerAlive= True
         self.imageWidgetSize = self.getImageWidgetSize()
         
         
     def close(self):
         __doc__ = DisplayBase.close.__doc__
+        
+        #terminate the worker process
         self.worker.terminate()
         
     def _checkIfWorkerDead(self):
+        """
+        
+        **SUMMARY**
+        
+        Checks if the Worker process has requested to be killed. Sets the
+        workerAlive flag
+        
+        """
         if(self.connection.poll()):
             if(self.connection.recv() == 'Kill Me' ):
                 print "rec"
@@ -53,7 +66,19 @@ class GtkDisplay(Display.DisplayBase):
                 self.worker.terminate()
                 self.workerAlive = False
                 
-    def getImageWidgetSize(self,data=None):        
+    def getImageWidgetSize(self):        
+        """
+        
+        **SUMMARY**
+        
+        Get the size allocated to the image widger in the Display
+        
+        **RETURNS**
+        
+        A (width,height) tuple
+        
+        """
+        
         self._checkIfWorkerDead()
         
         if(self.workerAlive):
@@ -68,6 +93,10 @@ class GtkDisplay(Display.DisplayBase):
         self._checkIfWorkerDead()
                
         if(self.workerAlive):
+            # Converts the image to a string and passes it in a dict along
+            # with other necessary info. This is more efficient than sending
+            # the whole image
+            
             dic = {}
             dic['function'] = 'showImage'
             dic['data'] = img.toString()

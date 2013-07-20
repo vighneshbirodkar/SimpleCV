@@ -11,6 +11,25 @@ from ... import Image
 #returns x,y,xScale,yScale
 #copied from adaptiveScale in ImageClass
 def smartScale(gdk, src, resolution):
+    """
+    **SUMMARY**
+    
+    Resizes an image preserving its aspect ratio. Copied from adaptive scale.
+    Is used to resize image for the display
+    
+    **PARAMETERS**
+    
+    * *gdk* - A gdk module object
+    
+    * *src* - The source pixbuf ( gtk.gdk.pixbuf )
+    
+    * *resolution*  - The desired resouution to scale to.
+    
+    **RETURNS**
+    
+    A resized pixbuf.
+    
+    """
     srcWidth = src.get_width()
     srcHeight = src.get_height()
     srcSize = srcWidth,srcHeight
@@ -88,7 +107,7 @@ class GtkWorker(Process):
     """
     A Process for handling a single Display window. Each GtkDisplay window has
     one instance of this class. For each task the GtkDisplay sends a message
-    to it's GtkWorker.
+    to it's GtkWorker.All communicattion happens over a duplex pipe.
     
     Each GUI function (*) in GtkDisplay has a corresponding handle_* method in
     GtkWorker . 
@@ -97,21 +116,45 @@ class GtkWorker(Process):
     
     
     """
+    
+    #the glade file contatning the gtk GUI layout
     _gladeFile = "main.glade"
     BGCOLOR = (.5,.5,1.0)
     def __init__(self,connection,size,type_,title,fit):
+        """
+        **SUMMARY**
+        
+        Creates a new process to handle the gtk mainloop for a display.
+        
+        **PARAMETERS**
+        
+        * *connection* - The connection used to communicate with parent
+         
+        * *size* - Initial size of display.
+        
+        * *type_* - The type of dispay.
+        
+        * *fit* - the fitting methods of the display.
+        
+        """
+        #TODO , the doc references
         Process.__init__(self)
         self.connection = connection
         self.size = size
         self.fit = fit
         self.title = title
         self.type_ = type_
-        self.cairoContext = None
         self.daemon = True
 
     def run(self):
+        """
+        **SUMMARY**
+        
+        Loads the layout from the glade file and starts the gtk mainloop
+        
+        """
         #Gtk imports have to be done in run, Otherwise Gtk thknks there are
-        #multiple copies of itself
+        #multiple copies of itself. These will be local to each process
         import gtk
         import gobject
         self.gtk = gtk
@@ -123,18 +166,19 @@ class GtkWorker(Process):
         builder.add_from_file(path)
         builder.connect_signals(self)
         
-        
+        #get required wigdets
         self.window = builder.get_object("window")
         self.scrolledWindow = builder.get_object("scrolledWindow")
         self.drawingArea = gtk.DrawingArea()
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
-        self.drawingArea.connect("expose-event",self.draw)
+        
+        #glade doesnt seem to have expose-event
+        self.drawingArea.connect("expose-event",self.draw)  
         
         self.scrolledWindow.add_with_viewport(self.drawingArea)
-
         self.viewPort = self.scrolledWindow.children()[0]
 
-        #when an image arrives, its data is stored here
+        #when an image arrives, its data is stored here, a dict type when not None
         self.imageData = None
         
         #the pixbuf used to load image
@@ -152,7 +196,8 @@ class GtkWorker(Process):
         #the offset from the drawing layer at which image is drawn
         self.offset = None
         
-        #the image being displayed, a simplecv Image object
+        #the image being displayed, a simplecv Image object, set only when
+        #necessary
         self.image = None
         
         self.window.set_title(self.title)
@@ -191,18 +236,32 @@ class GtkWorker(Process):
         else:
             raise ValueError("The fit method was not understood")
 
-        #calls pollMsg when gtk is idle
+        #calls pollMsg when gtk is idle.
+        #Gtk calls this function when it has nothing else to do. This ensures 
+        #that the worker repeatedly checks for arriving messages
         gobject.idle_add(self.pollMsg,None)
 
         
         gtk.main()
 
     def pollMsg(self,data=None):
+        """
+        
+        **SUMMARY** 
+        
+        Checks the connection to see id there are any requests from the parent
+        
+        **PARAMETERS**
+        
+        * *data* - Required for the gtk callback, always None.
+        
+        """
 
   
-        #check if there is any data to be read, wait for 100ms
+        #check if there is any data to be read, wait for 10ms
         #Is used because select.select/poll and gobject.idle_add dont work on windows
         dataThere = self.connection.poll(.001)
+        
         #handle data if it's there
         if(dataThere):
             self.checkMsg()
@@ -211,46 +270,81 @@ class GtkWorker(Process):
         return True
         
     def checkMsg(self):
+        """
+        
+        **SUMMARY**
+        
+        Reads the message from the parent and figures out what to do
+        
+        """
         
         #examine the message and figure out what to do with it
         msg = self.connection.recv()
 
-        if(type(msg) is dict):
-            funcName = "handle_" + msg['function']
-            funcToCall = self.__getattribute__(funcName)
-            funcToCall(msg)
-        else:
-            self.drawShape(msg) 
+        # A request from parent for the function 'XX' will call 'handle_XX' over
+        # here
+
+        funcName = "handle_" + msg['function']
+        funcToCall = self.__getattribute__(funcName)
+        funcToCall(msg)
+
             
     def handle_showImage(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Display the image requested by the parent
+        
+        **PARAMETERS**
+        
+        * *data* - The dict sent by the parent contaning the image data.
+        
+        """
         #show image from string
     
+        #invalidate existing image
         self.image = None
         self.imageData = data
         self.imgRealSize = (data['width'],data['height'])
         
+        #convert the string to a pixbuf
         self.pixbuf =  self.gtk.gdk.pixbuf_new_from_data(data['data'], self.gtk.gdk.COLORSPACE_RGB, False, data['depth'], data['width'], data['height'], data['width']*3)
         
+        # tell gtk to draw again
         self.drawingArea.queue_draw()
         
         if(self.type_ == Display.DEFAULT):
+            #enlarge display to show the image
             self.viewPort.set_size_request(data['width']+25,data['height']+25)
         elif(self.type_ == Display.FIXED):
             pass
         
     def handle_close(self,widget,data=None):
+    
+        #http://img.tapatalk.com/d/12/09/13/4yzanezu.jpg
         self.connection.send('Kill Me')
         self.window.hide()
         
         #Calling gtk.main_quit() stalls the parent application. This is because
-        #The child quits and parent blocks till the child ca receive
+        #The child quits and parent blocks till the child can receive data
         #
         #Instead we send the parent a message so that it terminates the child.
-        #This we the child can continue to receive a message that the parent 
+        #This way the child can continue to receive a message that the parent 
         #might be sending and the parent knows exactly when the display is 
-        #closed
+        #closed. 
+        #
+        #Closing merely hides the display. The parent terminate the process
+        #when it reads 'Kill Me'
         
-    def handle_getImageWidgetSize(self,data):
+    def handle_getImageWidgetSize(self):
+        """
+        
+        **SUMMARY**
+        
+        Send the area occupied by drawingArea to parent.
+        
+        """
         self.connection.send((self.drawingArea.get_allocation().width,self.drawingArea.get_allocation().height))
 
     def handle_configure_event(self,widget,event):
@@ -374,54 +468,87 @@ class GtkWorker(Process):
         self._scrollDir = None
 
     def draw(self,widget,eventData = None):
+        """
+        
+        **SUMMARY**
+        
+        Does the actual displaying of the received image data
+        
+        **PARAMETERS**
+        
+        * *widget* - The widget to draw on. In this case, drawingArea
+        
+        * *eventData* - None always
+        
+        """
+        
         if(self.pixbuf == None):
             return
         if(self.type_ == Display.DEFAULT):
-            self.scrolledWindow.set_size_request(10,10)
-            #self.viewPort.set_size_request(10,10)
-            #self.drawingArea.set_size_request(10,10)
-            pass
-        
+            #so that window can be resized to almost any size later
+            self.scrolledWindow.set_size_request(10,10)  
+    
         if(self.fit == Display.SCROLL):
+            #no resizing required
             pix = self.pixbuf
-            pass
         elif(self.fit == Display.RESIZE):
+            #resize the image to fit drawingArea
             areaWidth = self.drawingArea.get_allocation().width
             areaHeight = self.drawingArea.get_allocation().height
             pix = smartScale(self.gtk.gdk,self.pixbuf,(areaWidth,areaHeight))
         else:
-            pass
             
         cr = widget.window.cairo_create()
 
         #cr.scale(areaWidth,areaHeight)    
         if(self.fit == Display.SCROLL):
+            #No scaling, no offset, the image is displayed as is. Scrollbars
+            #take care of the excess part
             self.imgDisplaySize = self.imgRealSize
             self.offset = 0,0
             self.scale = 1,1
             self.drawingArea.set_size_request(*self.imgRealSize)
         elif(self.fit == Display.RESIZE):
+            # reduce the request so the window can be shrunk to lesser than the
+            # image size
             self.drawingArea.set_size_request(10,10)
+            
             self.imgDisplaySize =  (pix.get_width(),pix.get_height())
             self.offset = self.getCentreOffset()
             self.scale = float(self.imgDisplaySize[0])/self.imgRealSize[0] , float(self.imgDisplaySize[1])/self.imgRealSize[1]
             
+            #paint the background
             cr.set_source_rgb(*GtkWorker.BGCOLOR) # blue
             cr.rectangle(0, 0, areaWidth, areaHeight)
             cr.fill()
         
+        # clip, so that drawings dont go outside the image
         x,y,w,h = self.offset[0],self.offset[1],self.imgDisplaySize[0],self.imgDisplaySize[1]
         cr.rectangle(x,y,w,h)
         cr.clip()
         
+        #draw the image
         cr.set_source_pixbuf(pix,self.offset[0],self.offset[1])
         cr.paint()
         
+        #scale and translate the drawings
         cr.translate(*self.offset)
         cr.scale(*self.scale)
+        
         self.drawLayers(cr)
         
     def drawLayers(self,context):
+        """
+        
+        **SUMMARY**
+        
+        Draws the layers of the image
+        
+        **PARAMETERS**
+        
+        * *context* - The Cairo Context to be used for drawing.
+        
+        """
         if(self.imageData is None):
             return
         layers = self.imageData['layers']
@@ -431,6 +558,19 @@ class GtkWorker(Process):
                 self.drawShape(context,shape)
             
     def drawShape(self,cr,shape):
+        """
+        
+        **SUMMARY**
+        
+        Draws a shape on the image
+        
+        **PARAMETERS**
+        
+        * *cr* - The cairo context to draw on
+        
+        * *shape* - The shape to draw
+        
+        """
         if(type(shape) == Line):
             r,g,b = shape.color
             r,g,b = float(r)/255,float(g)/255,float(b)/255
@@ -442,11 +582,35 @@ class GtkWorker(Process):
             cr.stroke()
 
     def getCentreOffset(self):
+        """
+        
+        **SUMMARY**
+        
+        Returns the offset ( the amount by which top-left corener is displaced)
+        of the image.
+        
+        **RETURNS**
+        
+        A (x,y) tuple.
+        
+        """
         area = self.drawingArea.get_allocation().width, self.drawingArea.get_allocation().height
         imgSize = self.imgDisplaySize
         return (area[0] - imgSize[0])/2, (area[1] - imgSize[1])/2 
     
     def getImage(self):
+        """
+        
+        **SUMMARY** 
+        
+        Converts received data into a SimpleCV image.
+        
+        **RETURNS**
+        
+        A SimpleCV image.
+        
+        """
+        
         if(self.image == None):
             array = np.fromstring(self.imageData['data'],dtype='uint8')
             array = array.reshape(self.imageData['width'],self.imageData['height'],3)

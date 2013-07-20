@@ -103,10 +103,10 @@ class DisplayBase:
         
     
     def __repr__(self):
-        return "<SimpleCV %s resolution:(%s), Image Resolution: (%d, %d) at memory location: (%s)>" % (self.name(),self.size, self.imgSize[0], self.imgSize[1], hex(id(self)))
+        return "<SimpleCV %s resolution:(%s), at memory location: (%s)>" % (self.name(),self.size, hex(id(self)))
     
     
-    @abstractproperty
+    #@abstractproperty
     def mousePosition(self):
         """
         **SUMMARY**
@@ -121,7 +121,7 @@ class DisplayBase:
         """
         pass
         
-    @abstractproperty
+    #@abstractproperty
     def mousePositionRaw(self):
         """
         **SUMMARY**
