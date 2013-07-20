@@ -2,8 +2,11 @@
 These classes are used to represent the objects drawn on a drawing layer.
 
 **Note**
+These calsses should be kept picklable to be sent over a Pipe
+
 Not to be confused with classes in Detection.* . In addition to coordinates
 thse also store color, alpha and other displaying parameters
+
 """
 
 

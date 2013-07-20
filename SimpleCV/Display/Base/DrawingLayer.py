@@ -5,8 +5,14 @@ from ...Color import Color
 class DrawingLayer:
     
     """
+    
+    **SUMMARY**
     DrawingLayer gives you a way to mark up Image classes without changing
     the image data itself.
+
+    **NOTE**
+    This class should be kept picklable so that the it can be sent over a Pipe
+    
     """
 
     
