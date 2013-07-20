@@ -50,6 +50,14 @@ class DisplayBase:
     #A short string that should indicate the type of dislay
     @abstractmethod
     def name():
+        """
+        **SUMMARY**
+        Returns a description of the display
+        
+        **REUTRNS**
+        A string.
+        
+        """
         pass
     
     @abstractmethod

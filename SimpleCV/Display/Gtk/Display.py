@@ -19,13 +19,11 @@ class GtkDisplay(Display.DisplayBase):
     """
     
     def name(self): 
-        """
-        Returns a description of the display
-        """
+        __doc__ = DisplayBase.name.__doc__
         return "GtkDisplay"
         
     def __init__(self,size = (640,480),type_ = Display.DEFAULT,title = "SimpleCV",fit = Display.RESIZE):
-        #__doc__ = DisplayBase.__doc__
+        __doc__ = DisplayBase.__init__.__doc__
         DisplayBase.__init__(self,size,type_,title,fit)
         parentConnection,childConnnection = Pipe()
         
@@ -43,6 +41,7 @@ class GtkDisplay(Display.DisplayBase):
         
         
     def close(self):
+        __doc__ = DisplayBase.close.__doc__
         self.worker.terminate()
         
     def _checkIfWorkerDead(self):
@@ -99,42 +98,42 @@ class GtkDisplay(Display.DisplayBase):
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def leftButtonDownPosition(self):
+    def leftDown(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'leftButtonDownPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def rightButtonDownPosition(self):
+    def rightDown(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'rightButtonDownPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def leftButtonUpPosition(self):
+    def leftUp(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'leftButtonUpPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def rightButtonUpPosition(self):
+    def rightUp(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'rightButtonUpPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def middleButtonDownPosition(self):
+    def middleDown(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'middleButtonDownPosition'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
-    def middleButtonUpPosition(self):
+    def middleUp(self):
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'middleButtonUpPosition'
