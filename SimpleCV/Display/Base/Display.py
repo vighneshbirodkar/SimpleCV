@@ -106,7 +106,7 @@ class DisplayBase:
         return "<SimpleCV %s resolution:(%s), at memory location: (%s)>" % (self.name(),self.size, hex(id(self)))
     
     
-    #@abstractproperty
+    @abstractproperty
     def mousePosition(self):
         """
         **SUMMARY**
@@ -121,7 +121,7 @@ class DisplayBase:
         """
         pass
         
-    #@abstractproperty
+    @abstractproperty
     def mousePositionRaw(self):
         """
         **SUMMARY**

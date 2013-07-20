@@ -337,7 +337,7 @@ class GtkWorker(Process):
         #Closing merely hides the display. The parent terminate the process
         #when it reads 'Kill Me'
         
-    def handle_getImageWidgetSize(self):
+    def handle_getImageWidgetSize(self,data):
         """
         
         **SUMMARY**
@@ -496,7 +496,6 @@ class GtkWorker(Process):
             areaWidth = self.drawingArea.get_allocation().width
             areaHeight = self.drawingArea.get_allocation().height
             pix = smartScale(self.gtk.gdk,self.pixbuf,(areaWidth,areaHeight))
-        else:
             
         cr = widget.window.cairo_create()
 

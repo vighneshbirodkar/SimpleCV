@@ -66,7 +66,7 @@ class GtkDisplay(Display.DisplayBase):
                 self.worker.terminate()
                 self.workerAlive = False
                 
-    def getImageWidgetSize(self):        
+    def getImageWidgetSize(self):
         """
         
         **SUMMARY**
