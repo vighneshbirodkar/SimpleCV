@@ -19,7 +19,12 @@ class DrawingLayer:
 
     def __init__(self, (width,height)) :
         """
-        Sets all buffers
+        **SUMMARY**
+        
+        Initializes a drawing layer
+        
+        **PARAMETERS**
+        * *width,height* - The dimensions of the layer
         """
         self.imgSize = (width,height)
         self.bold = False
@@ -59,40 +64,49 @@ class DrawingLayer:
 
     def line(self, start, stop, color = Color.DEFAULT, width = 1, antialias = True, alpha = 255 ):
         """
+        
+        **SUMMARY**
+
         Draw a single line from the (x,y) tuple start to the (x,y) tuple stop.
         Optional parameters:
 
-        start - The starting point of the line.
+        **PARAMETERS**
         
-        stop - The ending point of the line.
+        * *start* - The starting point of the line.
+        
+        * *stop* - The ending point of the line.
 
-        color - Color object or Color Tuple
+        * *color* - Color object or Color Tuple
 
-        width - The line width in pixels.
+        * *width* - The line width in pixels.
 
-        antialias -  Whether of not the edges are antialiased.
+        * *antialias* -  Whether of not the edges are antialiased.
 
-        alpha - The alpha blending for the object. If this value is -1 then the
-                layer default value is used. A value of 255 means opaque, while 0
-                means transparent.
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
 
         """
         self._shapes.append(Line(start,stop,color,width,antialias,alpha))
 
     def lines(self, points, color = Color.DEFAULT, width = 1,  antialias = True, alpha = 255):
         """
+
+        **SUMMARY**
+
         Draw a set of lines from the list of (x,y) tuples points. Lines are draw
         between each successive pair of points.
 
-        points - a sequence of points to draw lines in between.
+        **PARAMETERS**
+        
+        * *points* - a sequence of points to draw lines in between.
 
-        color - Color object or Color Tuple
+        * *color* - Color object or Color Tuple
 
-        width - The line width in pixels.
+        * *width* - The line width in pixels.
 
-        antialias - Whether of not the edges are antialiased.
+        * *antialias* -  Whether of not the edges are antialiased.
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
 
         """
@@ -101,22 +115,26 @@ class DrawingLayer:
 
     def rectangle(self, topLeft, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a rectangle given the topLeft the (x,y) coordinate of the top left
         corner and dimensions (w,h) tge width and height
         
-        topLeft - The (x,y) coordinates of the top left corner of the rectangle
-
-        dimensions - The (width,height) pf the rectangle
-
-        color - Color object or Color Tuple.
+        **PARAMETERS**
         
-        width -  The width of the edges of the rectangle.
+        * *topLeft* - The (x,y) coordinates of the top left corner of the rectangle
 
-        filled - Whether or not the rectangle is filled
+        * *dimensions* - The (width,height) pf the rectangle
 
-        antialias - Whether of not the edges are antialiased
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *filled* - Whether or not the rectangle is filled
+
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
 
         """
@@ -126,21 +144,25 @@ class DrawingLayer:
 
     def rectangle2pts(self, pt0, pt1, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a rectangle given two (x,y) points
+
+        **PARAMETERS**
+                
+        * *pt0* - The top left corner of the rectangle.
         
-        pt0 - The top left corner of the rectangle.
+        * *pt1* - The bottom right corner of the rectangle.
+
+        * *color* - Color object or Color Tuple.
         
-        pt1 - The bottom right corner of the rectangle.
+        * *width* -  The width of the edges of the rectangle.
 
-        color - Color object or Color Tuple.
-        
-        width -  The width of the edges of the rectangle.
+        * *filled* - Whether or not the rectangle is filled
 
-        filled - Whether or not the rectangle is filled
+        * *antialias* - Whether of not the edges are antialiased
 
-        antialias - Whether of not the edges are antialiased
-
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
                 
         """
@@ -148,21 +170,25 @@ class DrawingLayer:
 
     def centeredRectangle(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a rectangle given the center (x,y) of the rectangle and dimensions (width, height)
 
-        center - The (x,y) coordinate of the center of the rectangle
+        **PARAMETERS**
         
-        dimensions - The (width,height) of the rectangle
+        * *center* - The (x,y) coordinate of the center of the rectangle
         
-        color - Color object or Color Tuple.
+        * *dimensions* - The (width,height) of the rectangle
         
-        width -  The width of the edges of the rectangle.
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        filled - Whether or not the rectangle is filled
+        * *filled* - Whether or not the rectangle is filled
 
-        antialias - Whether of not the edges are antialiased
+        * *antialias* - Whether of not the edges are antialiased
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
     
         """
@@ -172,41 +198,49 @@ class DrawingLayer:
 
     def polygon(self, points, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a polygon from a list of (x,y)
 
-        points - The list of (x,y) coordinates of the vertices of the polygon
+        **PARAMETERS**
         
-        color - Color object or Color Tuple.
+        * *points* - The list of (x,y) coordinates of the vertices of the polygon
         
-        width -  The width of the edges of the rectangle.
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        filled - Whether or not the rectangle is filled
+        * *filled* - Whether or not the rectangle is filled
 
-        antialias - Whether of not the edges are antialiased
+        * *antialias* - Whether of not the edges are antialiased
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
-                while 0 means transparent.
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent..
                 
         """
         _shapes.append(Polygon(points,color,width,filled,antialias,alpha))
 
     def circle(self, center, radius, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a circle given a location and a radius.
         
-        center - The (x,y) coordinates of the center.
+        **PARAMETERS**
         
-        radius - The radius of the circle.
-
-        color - Color object or Color Tuple.
+        * *center* - The (x,y) coordinates of the center.
         
-        width -  The width of the edges of the rectangle.
+        * *radius* - The radius of the circle.
 
-        filled - Whether or not the rectangle is filled
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        antialias - Whether of not the edges are antialiased
+        * *filled* - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
                 
         """
@@ -214,21 +248,25 @@ class DrawingLayer:
 
     def ellipse(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw an ellipse given a location and a dimensions.
         
-        center - The coordinates of the center.
+        **PARAMETERS**
         
-        dimensions - The length of axes along horizontal and vertical
-
-        color - Color object or Color Tuple.
+        * *center* - The coordinates of the center.
         
-        width -  The width of the edges of the rectangle.
+        * *dimensions* - The length of axes along horizontal and vertical
 
-        filled - Whether or not the rectangle is filled
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        antialias - Whether of not the edges are antialiased
+        * *filled* - Whether or not the rectangle is filled
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
                 
         """
@@ -237,17 +275,21 @@ class DrawingLayer:
 
     def bezier(self, points,  color = Color.DEFAULT,width = 1,antialias = True, alpha = 255 ):
         """
+        **SUMMARY**
+
         Draw a bezier curve based on the control points
 
-        points - Control points . You must specify more than 2 control points        
-
-        color - Color object or Color Tuple.
+        **PARAMETERS**
         
-        width -  The width of the edges of the rectangle.
+        * *points* - Control points . You must specify more than 2 control points        
 
-        antialias - Whether of not the edges are antialiased
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
 
         """
@@ -255,76 +297,35 @@ class DrawingLayer:
     
     def text(self, text, location, color = Color.DEFAULT,font = "",size = 20,bold = False ,italic = True,underline = False,  alpha = 255):
         """
+        **SUMMARY**
+
         Write the a text string at a given location
 
-        text -  A text string to print.
-
-        location - The location to place the top right corner of the text
-
-        color - Color object or Color Tuple
-
-        font - The font to be used. 
+        **PARAMETERS**
         
-        size - The size of letters.
-        
-        bold - Whether or not text is bold.
-        
-        italic - Whether or not text is italic.
-        
-        underline - Whether or not text is underlined
+        * *text* -  A text string to print.
 
-        alpha - The alpha blending for the object. A value of 255 means opaque, 
+        * *location* - The location to place the top right corner of the text
+
+        * *color* - Color object or Color Tuple
+
+        * *font* - The font to be used. 
+        
+        * *size* - The size of letters.
+        
+        * *bold* - Whether or not text is bold.
+        
+        * *italic* - Whether or not text is italic.
+        
+        * *underline* - Whether or not text is underlined
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
                 while 0 means transparent.
 
         """
         #TODO the docs
         _shapes.append(Text(text,location,self.fontName,self.fontSize,self.bold,self.italic,self.underline,antialias,alpha))
     
-    def setFontBold(self, doBold):
-        """
-        This method sets and unsets the current font to be bold.
-        """
-        self.bold = doBold
-        
-        
-    def setFontItalic(self, doItalic):
-        """
-        This method sets and unsets the current font to be italic.
-        """
-        self.italic = True
-        
-    def setFontUnderline(self, doUnderline):
-        """
-        This method sets and unsets the current font to be underlined
-        """
-        self.underline = doUnderline
-       
-    def selectFont(self, fontName):
-        """
-        This method attempts to set the font from a font file. It is advisable
-        to use one of the fonts listed by the listFonts() method. The input
-        is a string with the font name.
-        """
-        self.font = fontName
-        
-    @classmethod
-    def listFonts(self):
-        """
-        This method returns a list of strings corresponding to the fonts available
-        on the current system.
-        """
-        pass
-
-    def setFontSize(self, sz):
-        """
-        This method sets the font size roughly in points. A size of 10 is almost
-        too small to read. A size of 20 is roughly 10 pixels high and a good choice.
-
-        Parameters:
-            sz = Int
-        """
-        self.fontSize = sz
-
     def sprite(self,img,pos=(0,0),scale=1.0,rot=0.0,alpha=255):
         """
         sprite draws a sprite (a second small image) onto the current layer.
@@ -354,9 +355,21 @@ class DrawingLayer:
         pass
 
     def shapes(self):
+        """
+        **SUMMARY**
+        
+        Returns a list of shapes drawn on this layer
+        
+        **RETURNS**
+        
+        A list of shapes
+        
+        """
         return self._shapes
     def clear(self):
         """
+        **SUMMARY**
+        
         This method removes all of the drawing on this layer (i.e. the layer is
         erased completely)
         """
