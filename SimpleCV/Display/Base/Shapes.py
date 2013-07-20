@@ -60,7 +60,7 @@ class Bezier:
         self.alpha = alpha
         
 class Text:
-    def __init__(self, text, location, color ,font ,size, bold ,italic ,underline, alpha)
+    def __init__(self, text, location, color ,font ,size, bold ,italic ,underline, alpha):
         self.text = text
         self.location = location
         self.font = font

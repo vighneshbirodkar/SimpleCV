@@ -31,12 +31,6 @@ class DisplayBase:
     All coordinates specified or returned are a (x,y) tuple . The top left is
     (0,0) with Left -> Right and Up -> Down being positive
     
-    
-    * FULLSCREEN -  Opens up a fullscreen display
-    * DEFAULT - the default display which tries to fit the image in the best
-        possible way.
-    
-    
     **NOTES**
     
     While inheriting , ensure that the original doc string is prepended to the 
@@ -44,7 +38,7 @@ class DisplayBase:
     
     **EXAMPLE**
     
-    >>> display = MumboJumboDisplay()
+    >>> display = Display(type_ = FULLSCREEN)
     >>> image = Image('lenna')
     >>> image.save(display)
     
@@ -65,24 +59,30 @@ class DisplayBase:
         
         Opens up a display in a window. 
         
+        d = Display(type_ = FULLSCREEN,fit = SCROLL)
+        
         **PARAMETERS**
         
         * *size* - the size of the diplay in pixels.
+        
         * *type_* - Control how the diplay behaves, either FULSCREEN,FIXED or 
-            DEFAULT ( by default ).
+            DEFAULT ( by default ).FIXED keeps the display size as intialized.
+            FULLSCREEN makes the display fullscreened. 
+            
         * *title* - the title bar on the display, if there exists onw.
-        * *fit* - How to display the image if the type_ is FIXED. Either CROP or
-            RESIZE. Done with the help of adaptiveScale
+        
+        * *fit* - How to display the image if the image and display size does 
+            not match. Either SCROLL or RESIZE. SCROLL adds scroll bars
+            to the display. RESIZE, resizes the image to fit the display
         
         
         **EXAMPLE**
         
-        >>> disp = Display()
-        >>> img = Image('simplecv')
-        >>> img.save(disp)
+        >>> display = Display(type_ = FULLSCREEN,fit = SCROLL)
+        >>> img = Image('lenna')
+        >>> img.save(dispay)
         
         """
-        #TODO Add proper reference in above doc string for adaptiveScale
         
         screen = self
         self.size = size
@@ -98,29 +98,37 @@ class DisplayBase:
         return "<SimpleCV %s resolution:(%s), Image Resolution: (%d, %d) at memory location: (%s)>" % (self.name(),self.size, self.imgSize[0], self.imgSize[1], hex(id(self)))
     
     
-    #@abstractproperty
+    @abstractproperty
     def mousePosition(self):
         """
+        **SUMMARY**
+        
         Reutrns the mouse pointer potion as a tuple of (x,y), with respect to
         the image coordinates
-        """
+
+        **RETURNS**
         
-    #@abstractproperty
+        An (x,y) mouse postion tuple .
+        
+        """
+        pass
+        
+    @abstractproperty
     def mousePositionRaw(self):
         """
+        **SUMMARY**
+        
         Reutrns the mouse pointer potion as a tuple of (x,y), with respect to
         the display coordinates
-        """
         
+        **RETURNS**
         
-    #@abstractproperty
-    def mousePositionRaw(self):
+        An (x,y) mouse postion tuple .
+        
         """
-        Reutrns the mouse pointer potion as a tuple of (x,y), with respect to
-        the display coordinates
-        """
-    
-    #@abstractmethod
+        pass
+
+    @abstractmethod
     def leftDown(self):
         """
         **SUMMARY**
@@ -134,7 +142,7 @@ class DisplayBase:
         
         """
 
-    #@abstractmethod
+    @abstractmethod
     def leftUp(self):
         """
         **SUMMARY**
@@ -148,7 +156,7 @@ class DisplayBase:
         
         """
 
-    #@abstractmethod
+    @abstractmethod
     def rightDown(self):
         """
         **SUMMARY**
@@ -162,7 +170,7 @@ class DisplayBase:
         
         """
         
-    #@abstractmethod
+    @abstractmethod
     def rightUp(self):
         """
         **SUMMARY**
@@ -176,7 +184,7 @@ class DisplayBase:
         
         """
         
-    #@abstractmethod
+    @abstractmethod
     def middleDown(self):
         """
         **SUMMARY**
@@ -190,7 +198,7 @@ class DisplayBase:
         
         """
         
-    #@abstractmethod
+    @abstractmethod
     def middleUp(self):
         """
         **SUMMARY**

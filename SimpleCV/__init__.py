@@ -15,6 +15,7 @@ from SimpleCV.LineScan import *
 from SimpleCV.DFT import DFT
 from SimpleCV.Display.Base.Display import *
 from Display.Gtk.Display import GtkDisplay
+from Display.Base.Display import *
 
 Display = GtkDisplay
 

@@ -18,10 +18,14 @@ class GtkDisplay(Display.DisplayBase):
     
     """
     
-    def name(self):
+    def name(self): 
+        """
+        Returns a description of the display
+        """
         return "GtkDisplay"
         
     def __init__(self,size = (640,480),type_ = Display.DEFAULT,title = "SimpleCV",fit = Display.RESIZE):
+        #__doc__ = DisplayBase.__doc__
         DisplayBase.__init__(self,size,type_,title,fit)
         parentConnection,childConnnection = Pipe()
         
