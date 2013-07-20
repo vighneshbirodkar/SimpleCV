@@ -1,12 +1,12 @@
-
-from ..Base import DisplayBase
+from ..Base import Display
+from ..Base.Display import DisplayBase
 from ..Base import Line
 from ..Base import DisplayNotFoundException
 from Worker import GtkWorker
 from multiprocessing import Pipe
 
 
-class GtkDisplay(DisplayBase):
+class GtkDisplay(Display.DisplayBase):
     """
     A Display for SimpleCV using Gtk back-end. Each GtkDisplay spawns a GtkWorker,
     which is a seperate process do display images passed to it. GtkDisplay itself
@@ -21,7 +21,7 @@ class GtkDisplay(DisplayBase):
     def name(self):
         return "GtkDisplay"
         
-    def __init__(self,size = (640,480),type_ = DisplayBase.DEFAULT,title = "SimpleCV",fit = DisplayBase.RESIZE):
+    def __init__(self,size = (640,480),type_ = Display.DEFAULT,title = "SimpleCV",fit = Display.RESIZE):
         DisplayBase.__init__(self,size,type_,title,fit)
         parentConnection,childConnnection = Pipe()
         

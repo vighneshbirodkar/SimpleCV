@@ -1,6 +1,6 @@
 from SimpleCV.base import *
 from SimpleCV.ImageClass import Image, ImageSet
-from ..DisplayNew.Base.DrawingLayer import DrawingLayer
+from ..Display.Base.DrawingLayer import DrawingLayer
 from SimpleCV.Features import FeatureExtractorBase
 
 

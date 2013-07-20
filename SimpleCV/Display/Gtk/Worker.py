@@ -1,9 +1,12 @@
 from multiprocessing import Process,Pipe
 import os
-from ..Base import DisplayBase
+from ..Base import Display
+from ..Base import Display
 from ..Base import Line
+from ..Base.Display import *
 import numpy as np
-from ...ImageClass import Image
+from ... import Image
+
 
 #returns x,y,xScale,yScale
 #copied from adaptiveScale in ImageClass
@@ -169,20 +172,20 @@ class GtkWorker(Process):
         self._scrollPos = None
         self._scrollDir = None
 
-        if(self.type_ == DisplayBase.FULLSCREEN):
+        if(self.type_ == Display.FULLSCREEN):
             self.window.fullscreen()
-        elif(self.type_ == DisplayBase.FIXED):
+        elif(self.type_ == Display.FIXED):
             self.drawingArea.set_size_request(*self.size)
             self.window.set_resizable(False)
-        elif(self.type_ == DisplayBase.DEFAULT):
+        elif(self.type_ == Display.DEFAULT):
             #self.drawingArea.set_size_request(*self.size)
             self.drawingArea.set_size_request(*self.size)
         else:
             raise ValueError("The Display type was not understood")
             
-        if(self.fit == DisplayBase.RESIZE):
+        if(self.fit == Display.RESIZE):
             self.scrolledWindow.set_policy(self.gtk.POLICY_NEVER, self.gtk.POLICY_NEVER)
-        elif(self.fit == DisplayBase.SCROLL):
+        elif(self.fit == Display.SCROLL):
             print 'scroll'
             self.scrolledWindow.set_policy(self.gtk.POLICY_AUTOMATIC, self.gtk.POLICY_AUTOMATIC)
         else:
@@ -230,9 +233,9 @@ class GtkWorker(Process):
         
         self.drawingArea.queue_draw()
         
-        if(self.type_ == DisplayBase.DEFAULT):
+        if(self.type_ == Display.DEFAULT):
             self.viewPort.set_size_request(data['width']+25,data['height']+25)
-        elif(self.type_ == DisplayBase.FIXED):
+        elif(self.type_ == Display.FIXED):
             pass
         
     def handle_close(self,widget,data=None):
@@ -373,16 +376,16 @@ class GtkWorker(Process):
     def draw(self,widget,eventData = None):
         if(self.pixbuf == None):
             return
-        if(self.type_ == DisplayBase.DEFAULT):
+        if(self.type_ == Display.DEFAULT):
             self.scrolledWindow.set_size_request(10,10)
             #self.viewPort.set_size_request(10,10)
             #self.drawingArea.set_size_request(10,10)
             pass
         
-        if(self.fit == DisplayBase.SCROLL):
+        if(self.fit == Display.SCROLL):
             pix = self.pixbuf
             pass
-        elif(self.fit == DisplayBase.RESIZE):
+        elif(self.fit == Display.RESIZE):
             areaWidth = self.drawingArea.get_allocation().width
             areaHeight = self.drawingArea.get_allocation().height
             pix = smartScale(self.gtk.gdk,self.pixbuf,(areaWidth,areaHeight))
@@ -392,13 +395,13 @@ class GtkWorker(Process):
         cr = widget.window.cairo_create()
 
         #cr.scale(areaWidth,areaHeight)    
-        if(self.fit == DisplayBase.SCROLL):
+        if(self.fit == Display.SCROLL):
             self.imgDisplaySize = self.imgRealSize
             self.offset = 0,0
             self.scale = 1,1
             self.drawingArea.set_size_request(*self.imgRealSize)
-        elif(self.fit == DisplayBase.RESIZE):
-            
+        elif(self.fit == Display.RESIZE):
+            self.drawingArea.set_size_request(10,10)
             self.imgDisplaySize =  (pix.get_width(),pix.get_height())
             self.offset = self.getCentreOffset()
             self.scale = float(self.imgDisplaySize[0])/self.imgRealSize[0] , float(self.imgDisplaySize[1])/self.imgRealSize[1]

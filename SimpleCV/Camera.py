@@ -3,7 +3,6 @@
 #load system libraries
 from SimpleCV.base import *
 from SimpleCV.ImageClass import Image, ImageSet, ColorSpace
-from SimpleCV.Display import Display
 from SimpleCV.Color import Color
 from collections import deque
 import time
@@ -24,7 +23,7 @@ class FrameBufferThread(threading.Thread):
     causes problems at low sample rates.  This makes sure the frames returned
     by your camera are fresh.
 
-    """
+    """ 
     def run(self):
         global _cameras
         while (1):

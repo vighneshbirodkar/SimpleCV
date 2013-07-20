@@ -1,5 +1,16 @@
 from abc import ABCMeta,abstractmethod,abstractproperty
 
+#good ol flags, I think only these would be valid for all platforms
+DEFAULT = 0
+FULLSCREEN = 1
+
+#Display size doesn't change, come what may !
+FIXED = 2 
+
+#what to do with a bigger image when display size is fixed
+RESIZE = 0
+SCROLL = 1
+
 class DisplayNotFoundException(Exception):
     def __init__(self,display):
         self.display = display
@@ -38,18 +49,6 @@ class DisplayBase:
     >>> image.save(display)
     
     """
-    
-    
-    #good ol flags, I think only these would be valid for all platforms
-    DEFAULT = 0
-    FULLSCREEN = 1
-    
-    #Display size doesn't change, come what may !
-    FIXED = 2 
-    
-    #what to do with a bigger image when display size is fixed
-    RESIZE = 0
-    SCROLL = 1
     
     #The last display initialized, to be used for img.show()
     screen = None
