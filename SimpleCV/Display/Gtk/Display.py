@@ -130,42 +130,42 @@ class GtkDisplay(Display.DisplayBase):
     def leftDown(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'leftButtonDownPosition'
+            dic['function'] = 'leftDown'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
     def rightDown(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'rightButtonDownPosition'
+            dic['function'] = 'rightDown'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
     def leftUp(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'leftButtonUpPosition'
+            dic['function'] = 'leftUp'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
     def rightUp(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'rightButtonUpPosition'
+            dic['function'] = 'rightUp'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
     def middleDown(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'middleButtonDownPosition'
+            dic['function'] = 'middleDown'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
     def middleUp(self):
         if(self.workerAlive):
             dic = {}
-            dic['function'] = 'middleButtonUpPosition'
+            dic['function'] = 'middleUp'
             self.connection.send(dic)
             return self.connection.recv()[0]
 
@@ -182,5 +182,24 @@ class GtkDisplay(Display.DisplayBase):
             dic['function'] = 'mouseScrollType'
             self.connection.send(dic)
             return self.connection.recv()[0]
+
+    @property
+    def mousePosition(self):
+    	if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mousePosition'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+        
+
+    @property
+    def mousePositionRaw(self):
+        if(self.workerAlive):
+            dic = {}
+            dic['function'] = 'mousePositionRaw'
+            self.connection.send(dic)
+            return self.connection.recv()[0]
+
+    
 
 
