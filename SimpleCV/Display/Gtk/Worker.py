@@ -596,8 +596,8 @@ class GtkWorker(Process):
             cr.stroke_preserve()
             if shape.filled == True:
                 cr.fill()
-                cr.stroke()
-        if(type(shape) == Rectangle):
+            cr.stroke()
+        elif(type(shape) == Rectangle):
             cr.set_line_width(shape.width)
             w = shape.pt2[0]-shape.pt1[0]
             h = shape.pt2[1]-shape.pt1[1]
@@ -605,8 +605,8 @@ class GtkWorker(Process):
             cr.stroke_preserve()
             if shape.filled == True:
                 cr.fill()
-                cr.stroke()
-        if(type(shape) == Text):
+            cr.stroke()
+        elif(type(shape) == Text):
             cr.select_font_face(shape.font)
             cr.set_font_size(shape.size)
             cr.move_to(*shape.location)
