@@ -244,7 +244,7 @@ class DrawingLayer:
                 while 0 means transparent.
                 
         """
-        _shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
+        self._shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
 
     def ellipse(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """

@@ -2,10 +2,11 @@ from multiprocessing import Process,Pipe
 import os
 from ..Base import Display
 from ..Base import Display
-from ..Base import Line
+from ..Base import Line,Circle
 from ..Base.Display import *
 import numpy as np
 from ... import Image
+import math
 
 
 #returns x,y,xScale,yScale
@@ -588,6 +589,18 @@ class GtkWorker(Process):
             cr.move_to(*shape.start)
             cr.line_to(*shape.stop)
             cr.stroke()
+        if(type(shape) == Circle):
+            r,g,b = shape.color
+            r,g,b = float(r)/255,float(g)/255,float(b)/255
+            a = float(shape.alpha)/255
+            cr.set_source_rgba(r,g,b,a)
+            cr.set_line_width(shape.width)
+            cr.arc(shape.center[0],shape.center[1], shape.radius, 0., 2 * math.pi)
+            cr.stroke_preserve()
+            if shape.filled == True:
+                cr.fill()
+                cr.stroke()
+
 
     def getCentreOffset(self):
         """

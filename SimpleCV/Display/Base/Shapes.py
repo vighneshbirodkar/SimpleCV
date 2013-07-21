@@ -30,15 +30,17 @@ class Polygon:
         self.points = points
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 
-class Circle:
+class Circle(object):
     def __init__(self, center, radius, color, width, filled, antialias, alpha ):
-        self.conter = center
+        self.center = center
         self.radius = radius
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 

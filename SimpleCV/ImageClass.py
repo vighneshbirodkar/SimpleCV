@@ -3697,7 +3697,7 @@ class Image:
         return None
 
 
-    def drawCircle(self, ctr, rad, color = (0, 0, 0), thickness = 1):
+    def drawCircle(self, ctr, rad, color = (0, 0, 0), width = 1, filled = False, antialias = True, alpha = 255):
         """
         **SUMMARY**
 
@@ -3719,7 +3719,7 @@ class Image:
         **EXAMPLE**
 
         >>> img = Image("lenna")
-        >>> img.drawCircle((img.width/2,img.height/2),r=50,color=Colors.RED,width=3)
+        def drawCircle(self, ctr, rad, color = (0, 0, 0), thickness = 1):    >>> img.drawCircle((img.width/2,img.height/2),r=50,color=Colors.RED,width=3)
         >>> img.show()
 
         **NOTES**
@@ -3728,7 +3728,7 @@ class Image:
           Note that this function is depricated, try to use DrawingLayer.circle() instead.
 
         **SEE ALSO**
-
+    def drawCircle(self, ctr, rad, color = (0, 0, 0), thickness = 1):
         :py:meth:`drawLine`
         :py:meth:`drawText`
         :py:meth:`dl`
@@ -3736,10 +3736,9 @@ class Image:
         :py:class:`DrawingLayer`
 
         """
-        if( thickness < 0):
-            self.getDrawingLayer().circle((int(ctr[0]), int(ctr[1])), int(rad), color, int(thickness),filled=True)
-        else:
-            self.getDrawingLayer().circle((int(ctr[0]), int(ctr[1])), int(rad), color, int(thickness))
+        
+        self.getDrawingLayer().circle((int(ctr[0]), int(ctr[1])), int(rad), color, width, filled, antialias, alpha)
+
 
 
     def drawLine(self, start, stop, color=(0,0,0) ,width =1, antialias = True,alpha = 255):
