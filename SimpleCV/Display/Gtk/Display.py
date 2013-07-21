@@ -117,7 +117,7 @@ class GtkDisplay(Display.DisplayBase):
             dic = {}
             dic['function'] = 'mouseX'
             self.connection.send(dic)
-            return self.connection.recv()[0]
+            return self.connection.recv()
 
     @property
     def mouseY(self):
@@ -125,7 +125,7 @@ class GtkDisplay(Display.DisplayBase):
             dic = {}
             dic['function'] = 'mouseY'
             self.connection.send(dic)
-            return self.connection.recv()[0]
+            return self.connection.recv()
 
     def leftDown(self):
         if(self.workerAlive):
@@ -189,7 +189,7 @@ class GtkDisplay(Display.DisplayBase):
             dic = {}
             dic['function'] = 'mousePosition'
             self.connection.send(dic)
-            return self.connection.recv()[0]
+            return self.connection.recv()
         
 
     @property
@@ -198,7 +198,7 @@ class GtkDisplay(Display.DisplayBase):
             dic = {}
             dic['function'] = 'mousePositionRaw'
             self.connection.send(dic)
-            return self.connection.recv()[0]
+            return self.connection.recv()
 
     
 

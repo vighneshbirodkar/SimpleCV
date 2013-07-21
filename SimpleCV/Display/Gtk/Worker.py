@@ -170,7 +170,7 @@ class GtkWorker(Process):
         self.window = builder.get_object("window")
         self.scrolledWindow = builder.get_object("scrolledWindow")
         self.drawingArea = gtk.DrawingArea()
-        self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK)
+        self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK|gtk.gdk.POINTER_MOTION_MASK)
 
         
         #glade doesnt seem to have expose-event
@@ -179,6 +179,7 @@ class GtkWorker(Process):
         self.drawingArea.connect("button_press_event",self.mouse_press)
         self.drawingArea.connect("button_release_event",self.mouse_release)
         self.drawingArea.connect("scroll_event",self.mouse_scroll)
+        self.drawingArea.connect("motion_notify_event", self.mouse_motion)
 
         
         self.scrolledWindow.add_with_viewport(self.drawingArea)
@@ -211,6 +212,7 @@ class GtkWorker(Process):
 
 
         self._winWidth, self._winHeight = self.window.get_size()
+        self._position = None
         self._mouseX = None
         self._mouseY = None
 
@@ -358,20 +360,21 @@ class GtkWorker(Process):
         self._winHeight = event.height
 
     def handle_mouseX(self,data):
-        self._mouseX = self.drawingArea.get_pointer() [0]
-        if self._mouseX < 0:
-            self._mouseX = 0
-        if self._mouseX > self.drawingArea.get_allocation().width:
-            self._mouseX = self.drawingArea.get_allocation().width
-        self.connection.send((self._mouseX,))
-
+        if self._position is not None:
+            pos = self._clamp(self._mouseOffset(self._position))[0]
+        else:
+            pos = None
+        self.connection.send(pos)
+        
     def handle_mouseY(self,data):
-        self._mouseY = self.drawingArea.get_pointer() [1]
-        if self._mouseY < 0:
-            self._mouseY = 0
-        if self._mouseY > self.drawingArea.get_allocation().height:
-            self._mouseY = self.drawingArea.get_allocation().height
-        self.connection.send((self._mouseY,))
+        if self._position is not None:
+            pos = self._clamp(self._mouseOffset(self._position))[1]
+        else:
+            pos = None
+        self.connection.send(pos)
+        
+    def mouse_motion(self,widget,event):
+        self._position = (event.x,event.y)
 
     def mouse_press(self,widget,event):
         if event.button == 1 :
@@ -401,7 +404,7 @@ class GtkWorker(Process):
         if pos[0] < 0:
             pos[0] = 0
         elif pos[0] > self.imgDisplaySize[0]:
-            pos[0] = self.imgDisplaySize
+            pos[0] = self.imgDisplaySize[0]
         if pos[1] < 0:
             pos[1] = 0
         elif pos[1] > self.imgDisplaySize[1]:
@@ -629,12 +632,12 @@ class GtkWorker(Process):
             self._mouseX = 0
         if self._mouseX > self.drawingArea.get_allocation().width:
             self._mouseX = self.drawingArea.get_allocation().width
-            self._mouseY = self.drawingArea.get_pointer() [1]
+        self._mouseY = self.drawingArea.get_pointer() [1]
         if self._mouseY < 0:
             self._mouseY = 0
         if self._mouseY > self.drawingArea.get_allocation().height:
             self._mouseY = self.drawingArea.get_allocation().height
-        self.connection.send((self.mouseX,self._mouseY),)
+        self.connection.send((self._mouseX,self._mouseY))
 
 
     def handle_mousePositionRaw(self,data):
