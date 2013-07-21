@@ -627,19 +627,12 @@ class GtkWorker(Process):
         return self.image
             
     def handle_mousePosition(self, data):
-        self._mouseX = self.drawingArea.get_pointer() [0]
-        if self._mouseX < 0:
-            self._mouseX = 0
-        if self._mouseX > self.drawingArea.get_allocation().width:
-            self._mouseX = self.drawingArea.get_allocation().width
-        self._mouseY = self.drawingArea.get_pointer() [1]
-        if self._mouseY < 0:
-            self._mouseY = 0
-        if self._mouseY > self.drawingArea.get_allocation().height:
-            self._mouseY = self.drawingArea.get_allocation().height
-        self.connection.send((self._mouseX,self._mouseY))
-
+        if self._position is not None:
+            pos = self._clamp(self._mouseOffset(self._position))
+        else:
+            pos = None
+        self.connection.send(pos)
 
     def handle_mousePositionRaw(self,data):
-        pass
+        self.connection.send(self._position)
 
