@@ -296,7 +296,7 @@ class DrawingLayer:
         """
         self._shapes.append(Bezier(points,steps,color,width,antialias,alpha))
     
-    def text(self, text, location, color = Color.DEFAULT,font = "",size = 20,bold = False ,italic = True,underline = False,  alpha = 255):
+    def text(self, text, location, color = Color.DEFAULT,size = 20,font = "",bold = False ,italic = True,underline = False,  alpha = 255):
         """
         **SUMMARY**
 
@@ -325,7 +325,7 @@ class DrawingLayer:
 
         """
         #TODO the docs
-        self._shapes.append(Text(text,location,self.fontName,self.fontSize,self.bold,self.italic,self.underline,antialias,alpha))
+        self._shapes.append(Text(text,location, color, size, font, bold, italic, underline, alpha))
     
     def sprite(self,img,pos=(0,0),scale=1.0,rot=0.0,alpha=255):
         """

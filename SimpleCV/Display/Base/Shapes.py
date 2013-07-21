@@ -63,7 +63,7 @@ class Bezier(object):
         self.alpha = alpha
         
 class Text(object):
-    def __init__(self, text, location, color ,font ,size, bold ,italic ,underline, alpha):
+    def __init__(self, text, location, color ,size, font , bold ,italic ,underline, alpha):
         self.text = text
         self.location = location
         self.font = font
@@ -72,8 +72,6 @@ class Text(object):
         self.italic = italic
         self.underline = underline
         self.color = color
-        self.width = width
-        self.antialias = antialias
         self.alpha = alpha
 
 

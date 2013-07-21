@@ -585,19 +585,20 @@ class GtkWorker(Process):
         r,g,b = float(r)/255,float(g)/255,float(b)/255
         a = float(shape.alpha)/255
         cr.set_source_rgba(r,g,b,a)
-        cr.set_line_width(shape.width)
         if(type(shape) == Line):
+            cr.set_line_width(shape.width)
             cr.move_to(*shape.start)
             cr.line_to(*shape.stop)
             cr.stroke()
         elif(type(shape) == Circle):
+            cr.set_line_width(shape.width)
             cr.arc(shape.center[0],shape.center[1], shape.radius, 0., 2 * math.pi)
             cr.stroke_preserve()
             if shape.filled == True:
                 cr.fill()
                 cr.stroke()
         if(type(shape) == Rectangle):
-            print("entered if")
+            cr.set_line_width(shape.width)
             w = shape.pt2[0]-shape.pt1[0]
             h = shape.pt2[1]-shape.pt1[1]
             cr.rectangle(shape.pt1[0],shape.pt1[1],w,h)
@@ -605,6 +606,12 @@ class GtkWorker(Process):
             if shape.filled == True:
                 cr.fill()
                 cr.stroke()
+        if(type(shape) == Text):
+            cr.select_font_face(shape.font)
+            cr.set_font_size(shape.size)
+            cr.move_to(*shape.location)
+            cr.show_text(shape.text)
+
 
 
     def getCentreOffset(self):
