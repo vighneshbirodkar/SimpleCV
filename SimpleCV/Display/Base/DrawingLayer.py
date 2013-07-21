@@ -117,7 +117,7 @@ class DrawingLayer:
 
         """
         for i in range(len(points)-1):
-        	line(points[i],points[i+1],color,width,antialias,alpha)
+        	self.line(points[i],points[i+1],color,width,antialias,alpha)
 
     def rectangle(self, topLeft, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
@@ -144,11 +144,12 @@ class DrawingLayer:
                 while 0 means transparent.
 
         """
-        p0 = topLeft
-        p1 = (topLeft[0]+dimensions[0],topLeft[1]+dimensions[1])
-        rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
+        
+        _p1 = topLeft
+        _p2 = (topLeft[0]+dimensions[0],topLeft[1]+dimensions[1])
+        self.rectangle2pts(_p1, _p2, color, width, filled, antialias, alpha)
 
-    def rectangle2pts(self, pt0, pt1, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
+    def rectangle2pts(self, pt1, pt2, color = Color.DEFAULT,width = 1, filled = False,antialias = True,  alpha = 255 ):
         """
         **SUMMARY**
 
@@ -156,9 +157,9 @@ class DrawingLayer:
 
         **PARAMETERS**
                 
-        * *pt0* - The top left corner of the rectangle.
+        * *pt1* - The top left corner of the rectangle.
         
-        * *pt1* - The bottom right corner of the rectangle.
+        * *pt2* - The bottom right corner of the rectangle.
 
         * *color* - Color object or Color Tuple.
         
@@ -172,7 +173,7 @@ class DrawingLayer:
                 while 0 means transparent.
                 
         """
-        _shapes.append(Rectangle(pt1,pt2,color,width,filled,antialias,alpha))
+        self._shapes.append(Rectangle(pt1,pt2,color,width,filled,antialias,alpha))
 
     def centeredRectangle(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
@@ -200,7 +201,7 @@ class DrawingLayer:
         """
         p0 = (center[0]-dimensions[0]/2.0,center[1]-dimensions[1]/2.0)
         p1 = (center[0]+dimensions[0]/2.0,center[1]+dimensions[1]/2.0)
-        rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
+        self.rectangle2pts(p0,p1,color,antialias,width,filled,alpha)
 
     def polygon(self, points, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
@@ -224,7 +225,7 @@ class DrawingLayer:
                 while 0 means transparent..
                 
         """
-        _shapes.append(Polygon(points,color,width,filled,antialias,alpha))
+        self._shapes.append(Polygon(points,color,width,filled,antialias,alpha))
 
     def circle(self, center, radius, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
@@ -250,7 +251,7 @@ class DrawingLayer:
                 while 0 means transparent.
                 
         """
-        _shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
+        self._shapes.append(Circle(center,radius,color,width,filled,antialias,alpha))
 
     def ellipse(self, center, dimensions, color = Color.DEFAULT,width = 1, filled = False,antialias = True, alpha = 255 ):
         """
@@ -276,7 +277,7 @@ class DrawingLayer:
                 while 0 means transparent.
                 
         """
-        _shapes.append(Ellipse(center,dimensions,color,width,filled,antialias,alpha))
+        self._shapes.append(Ellipse(center,dimensions,color,width,filled,antialias,alpha))
        
 
     def bezier(self, points,  color = Color.DEFAULT,width = 1,antialias = True, alpha = 255 ):
@@ -299,9 +300,9 @@ class DrawingLayer:
                 while 0 means transparent.
 
         """
-        _shapes.append(Bezier(points,steps,color,width,antialias,alpha))
+        self._shapes.append(Bezier(points,steps,color,width,antialias,alpha))
     
-    def text(self, text, location, color = Color.DEFAULT,font = "",size = 20,bold = False ,italic = True,underline = False,  alpha = 255):
+    def text(self, text, location, color = Color.DEFAULT,size = 20,font = "",bold = False ,italic = True,underline = False,  alpha = 255):
         """
         **SUMMARY**
 
@@ -330,7 +331,7 @@ class DrawingLayer:
 
         """
         #TODO the docs
-        _shapes.append(Text(text,location,self.fontName,self.fontSize,self.bold,self.italic,self.underline,antialias,alpha))
+        self._shapes.append(Text(text,location, color, size, font, bold, italic, underline, alpha))
     
     def sprite(self,img,pos=(0,0),scale=1.0,rot=0.0,alpha=255):
         """
@@ -381,3 +382,4 @@ class DrawingLayer:
         """
         self._shapes = []
     #TODO ezview text
+    #TODO rotatedrectangle

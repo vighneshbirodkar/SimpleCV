@@ -19,33 +19,36 @@ class Line(object):
         self.antialias = antialias
         self.alpha = alpha
 
-class Rectangle:
+class Rectangle(object):
     def __init__(self,pt1,pt2,color ,width,filled,antialias,alpha):
         self.pt1 = pt1
         self.pt2 = pt2
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 
-class Polygon:
+class Polygon(object):
     def __init__(self,points,color, width, filled, antialias, alpha ):
         self.points = points
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 
-class Circle:
+class Circle(object):
     def __init__(self, center, radius, color, width, filled, antialias, alpha ):
-        self.conter = center
+        self.center = center
         self.radius = radius
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 
-class Ellipse:
+class Ellipse(object):
     def __init__(self, center, dimensions, color, width,filled ,antialias ,alpha ):
         
         self.center = center
@@ -55,15 +58,15 @@ class Ellipse:
         self.antialias = antialias
         self.alpha = alpha
 
-class Bezier:
+class Bezier(object):
     def __init__(self, points, color, antialias, alpha ):
         self.points = points
         self.color = color
         self.antialias = antialias
         self.alpha = alpha
         
-class Text:
-    def __init__(self, text, location, color ,font ,size, bold ,italic ,underline, alpha):
+class Text(object):
+    def __init__(self, text, location, color ,size, font , bold ,italic ,underline, alpha):
         self.text = text
         self.location = location
         self.font = font
@@ -72,8 +75,6 @@ class Text:
         self.italic = italic
         self.underline = underline
         self.color = color
-        self.width = width
-        self.antialias = antialias
         self.alpha = alpha
 
 
