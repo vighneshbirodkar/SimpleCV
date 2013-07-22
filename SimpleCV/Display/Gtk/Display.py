@@ -71,7 +71,7 @@ class GtkDisplay(Display.DisplayBase):
         
         **SUMMARY**
         
-        Get the size allocated to the image widger in the Display
+        Get the size allocated to the image widget in the Display
         
         **RETURNS**
         
@@ -90,6 +90,23 @@ class GtkDisplay(Display.DisplayBase):
             raise DisplayNotFoundException(self)
     
     def showImage(self,img):
+        """
+
+        **SUMMARY**
+
+        Show the image. 
+
+        **PARAMETERS**
+
+        * *img = a SimpleCV Image object to be displayed 
+
+        **Example**
+        >>> img = Image('lenna')
+        >>> d = Display()
+        >>> d.showImage(img)
+
+
+        """
         self._checkIfWorkerDead()
                
         if(self.workerAlive):
@@ -113,6 +130,22 @@ class GtkDisplay(Display.DisplayBase):
 
     @property
     def mouseX(self):
+        """
+        
+        **SUMMARY**
+        Returns the current x coordinate of the mouse pointer on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the x coordinate returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'mouseX'
@@ -121,6 +154,22 @@ class GtkDisplay(Display.DisplayBase):
 
     @property
     def mouseY(self):
+        """
+        
+        **SUMMARY**
+        Returns the current y coordinate of the mouse pointer on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the y coordinate returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'mouseY'
@@ -128,6 +177,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()
 
     def leftDown(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the left mouse button was pressed on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'leftDown'
@@ -135,6 +200,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def rightDown(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the right mouse button was pressed on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'rightDown'
@@ -142,6 +223,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def leftUp(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the left mouse button was released on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'leftUp'
@@ -149,6 +246,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def rightUp(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the right mouse button was released on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'rightUp'
@@ -156,6 +269,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def middleDown(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the middle mouse button was pressed on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'middleDown'
@@ -163,6 +292,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def middleUp(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the middle mouse button was released on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'middleUp'
@@ -170,6 +315,22 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def mouseScrollPosition(self):
+        """
+        
+        **SUMMARY**
+        Returns the position where the mouse was scrolled. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'mouseScrollPosition'
@@ -177,6 +338,13 @@ class GtkDisplay(Display.DisplayBase):
             return self.connection.recv()[0]
 
     def mouseScrollType(self):
+        """
+        
+        **SUMMARY**
+        Returns the direction in which the mouse was scrolled. either 'up' or 'down' . 
+
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'mouseScrollType'
@@ -185,7 +353,22 @@ class GtkDisplay(Display.DisplayBase):
 
     @property
     def mousePosition(self):
-    	if(self.workerAlive):
+        """
+        
+        **SUMMARY**
+        Returns the position of the mouse pointer on the image. 
+
+        **NOTE**
+        This position is with respect to the actual size of the image. 
+        For example, if the image is of size 512x512, and the display is initilized with 
+        fit = RESIZE, then the image can be shown to be at a higher or a lower size. 
+        But the position returned by the function are scaled to match the size
+        of the actual image. Use this function for any image manipulation. Use mousePositionRaw()
+        to get the position of the mouse wrt the display
+
+
+        """
+        if(self.workerAlive):
             dic = {}
             dic['function'] = 'mousePosition'
             self.connection.send(dic)
@@ -194,6 +377,12 @@ class GtkDisplay(Display.DisplayBase):
 
     @property
     def mousePositionRaw(self):
+        """
+        
+        **SUMMARY**
+        Returns the position of the mouse pointer on the whole display. 
+
+        """
         if(self.workerAlive):
             dic = {}
             dic['function'] = 'mousePositionRaw'

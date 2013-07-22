@@ -171,12 +171,14 @@ class GtkWorker(Process):
         self.window = builder.get_object("window")
         self.scrolledWindow = builder.get_object("scrolledWindow")
         self.drawingArea = gtk.DrawingArea()
+
+        #Masks are added to get mouse button press, release and mouse pointer motion events
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK|gtk.gdk.POINTER_MOTION_MASK)
 
-        
         #glade doesnt seem to have expose-event
         self.drawingArea.connect("expose-event",self.draw)
 
+        #connecting mouse events related signals to functions
         self.drawingArea.connect("button_press_event",self.mouse_press)
         self.drawingArea.connect("button_release_event",self.mouse_release)
         self.drawingArea.connect("scroll_event",self.mouse_scroll)
@@ -211,12 +213,15 @@ class GtkWorker(Process):
         self.window.set_title(self.title)
         self.window.show_all()
 
-
+        #size of the window
         self._winWidth, self._winHeight = self.window.get_size()
+
+        #updates whenever mouse motion occurs
         self._position = None
+
+        #these values are updated by the mouse* functions
         self._mouseX = None
         self._mouseY = None
-
         self._leftMouseDownPos = None
         self._rightMouseDownPos = None
         self._leftMouseUpPos = None
@@ -249,7 +254,6 @@ class GtkWorker(Process):
         #that the worker repeatedly checks for arriving messages
         gobject.idle_add(self.pollMsg,None)
 
-        
         gtk.main()
 
     def pollMsg(self,data=None):
@@ -356,27 +360,86 @@ class GtkWorker(Process):
         self.connection.send((self.drawingArea.get_allocation().width,self.drawingArea.get_allocation().height))
 
     def handle_configure_event(self,widget,event):
+        """
+
+        **SUMMARY**
+
+        Updates the windows dimension in the variable as soon as the window is reconfigure(resized,etc)
+        These variable are used in other funtions.
+
+        """
         self._winWidth = event.width
         self._winHeight = event.height
 
     def handle_mouseX(self,data):
+        """
+
+        **SUMMARY**
+
+        Sends the current X coordinate of the mouse position on the image. 
+
+        *NOTE* 
+
+        If the display is initialized with fit= RESIZE, the coordinates returned
+        are according to the size of the image. For example, if the image is 512x512, then 
+        the bottom left corner of the image will have mouse X position returned as 512, even if 
+        the display is resized to make the image bigger or smaller. To get the position of 
+        the mouse pointer as visible on the screen use the mousePositionRaw.
+        
+
+        """
         if self._position is not None:
             pos = self._clamp(self._mouseOffset(self._position))[0]
+            pos = int(pos/self.scale[0])
         else:
             pos = None
         self.connection.send(pos)
         
     def handle_mouseY(self,data):
+        """
+
+        **SUMMARY**
+
+        Sends the current Y coordinate of the mouse position on the image.
+
+        *NOTE* 
+
+        If the display is initialized with fit= RESIZE, even then the coordinates returned
+        are according to the size of the image. For example, if the image is 512x512, then 
+        the bottom left corner of the image will have mouse X position returned as 512, 
+        even if the display is resized to make the image bigger or smaller.
+        To get the position of the mouse pointer as visible on the screen use the mousePositionRaw().
+        
+
+        """        
         if self._position is not None:
             pos = self._clamp(self._mouseOffset(self._position))[1]
+            pos = int(pos/self.scale[1])
         else:
             pos = None
         self.connection.send(pos)
         
     def mouse_motion(self,widget,event):
+        """
+        
+        **SUMMARY**
+        
+        Updates the mouse position whenever mouse pointer moves
+        
+        """
+
         self._position = (event.x,event.y)
 
     def mouse_press(self,widget,event):
+        """
+        
+        **SUMMARY**
+        
+        This function is called autmatically whenever a mouse button is pressed(goes down).
+        It checks which of mouse button(Left, Right, or Middle) is pressed and assigns the 
+        position where the mouse was pressed to the corresponding button's press(down) variable.
+         
+        """
         if event.button == 1 :
             self._leftMouseDownPos = (event.x,event.y)
         if event.button == 2 :
@@ -385,6 +448,15 @@ class GtkWorker(Process):
             self._rightMouseDownPos = (event.x,event.y)
 
     def mouse_release(self,widget,event):
+        """
+        
+        **SUMMARY**
+        
+        This function is called autmatically whenever a mouse button is released(goes up).
+        It checks which of mouse button(Left, Right, or Middle) is released and assigns the 
+        position where the mouse was released to the corresponding button's release(up) variable.
+         
+        """
         if event.button == 1 :
             self._leftMouseUpPos = (event.x,event.y)
         if event.button == 2 :
@@ -393,6 +465,15 @@ class GtkWorker(Process):
             self._rightMouseUpPos = (event.x,event.y)
 
     def mouse_scroll(self,widget,event):
+        """
+        
+        **SUMMARY**
+        
+        This function is called autmatically whenever a mouse is scrolled.
+        It assigns the position where the mouse was scrolled and the direction of the scroll
+        (up or down) to the corresponding variables.
+         
+        """
         self._scrollPos = (event.x,event.y)
         if str(event.direction) == '<enum GDK_SCROLL_UP of type GdkScrollDirection>':
             self._scrollDir = 'up'
@@ -400,6 +481,17 @@ class GtkWorker(Process):
             self._scrollDir = 'down'
 
     def _clamp(self,pos):
+        """
+        
+        **SUMMARY**
+        
+        Clamps the values of the mouse psotion to the size of the image
+
+        **PARAMETERS**
+
+        * *pos* - The position coordinates to be clamped in the form of (x,y) tuple
+
+        """
         pos = list(pos)
         if pos[0] < 0:
             pos[0] = 0
@@ -413,11 +505,29 @@ class GtkWorker(Process):
 
 
     def _mouseOffset(self,pos):
+        """
+        
+        **SUMMARY**
+        
+        Set the correct offset for the mouse position so that the top left corner  
+
+        **PARAMETERS**
+
+        * *pos* - The position coordinates to be clamped in the form of (x,y) tuple
+        
+        """
         diff = self.offset
         return (pos[0]-diff[0],pos[1]-diff[1])
 
 
     def handle_leftDown(self, data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the left mouse button was pressed.
+        
+        """
         if self._leftMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._leftMouseDownPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -427,6 +537,13 @@ class GtkWorker(Process):
         self._leftMouseDownPos = None
 
     def handle_rightDown(self, data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the right mouse button was pressed.
+        
+        """
         if self._rightMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._rightMouseDownPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -436,6 +553,13 @@ class GtkWorker(Process):
         self._rightMouseDownPos = None
 
     def handle_leftUp(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the left mouse button was released.
+        
+        """
         if self._leftMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._leftMouseUpPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -445,6 +569,13 @@ class GtkWorker(Process):
         self._leftMouseUpPos = None
 
     def handle_rightUp(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the right mouse button was released.
+        
+        """
         if self._rightMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._rightMouseUpPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -454,6 +585,13 @@ class GtkWorker(Process):
         self._rightMouseUpPos = None
 
     def handle_middleDown(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the middle mouse button was pressed
+        
+        """
         if self._middleMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._middleMouseDownPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -463,6 +601,13 @@ class GtkWorker(Process):
         self._middleMouseDownPos = None
 
     def handle_middleUp(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the middle mouse button was released.
+        
+        """
         if self._middleMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._middleMouseUpPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -472,6 +617,13 @@ class GtkWorker(Process):
         self._middleMouseUpPos = None
 
     def handle_mouseScrollPosition(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position where the mouse was scrolled.
+        
+        """
         if self._scrollPos is not None:
             p = self._clamp(self._mouseOffset(self._scrollPos))
             p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
@@ -481,6 +633,13 @@ class GtkWorker(Process):
         self._scrollPos = None
 
     def handle_mouseScrollType(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the direction of the mouse scroll ('up' or 'down')
+        
+        """
         self.connection.send((self._scrollDir,))
         self._scrollDir = None
 
@@ -659,6 +818,22 @@ class GtkWorker(Process):
         return self.image
             
     def handle_mousePosition(self, data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position of the mouse on the image. Returns None if mouse pointer
+        is not on the image. use this for any kind of image manipulation
+ 
+        *NOTE* 
+
+        If the display is initialized with fit= RESIZE, the coordinates returned
+        are according to the size of the image. For example, if the image is 512x512, then 
+        the bottom left corner of the image will have mouse position returned as (512,512) even if 
+        the display is resized to make the image bigger or smaller. To get the position of 
+        the mouse pointer as visible on the screen use the mousePositionRaw.
+ 
+        """
         if self._position is not None:
             pos = self._clamp(self._mouseOffset(self._position))
             pos = (int(pos[0]/self.scale[0]),int(pos[1]/self.scale[1]))
@@ -667,5 +842,12 @@ class GtkWorker(Process):
         self.connection.send(pos)
 
     def handle_mousePositionRaw(self,data):
+        """
+        
+        **SUMMARY**
+        
+        Sends the position of the mouse pointer on the whole display
+        
+        """
         self.connection.send(self._position)
 
