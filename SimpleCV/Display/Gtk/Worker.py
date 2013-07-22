@@ -236,7 +236,6 @@ class GtkWorker(Process):
             self.drawingArea.set_size_request(*self.size)
         else:
             raise ValueError("The Display type was not understood")
-            
         if(self.fit == Display.RESIZE):
             self.scrolledWindow.set_policy(self.gtk.POLICY_NEVER, self.gtk.POLICY_NEVER)
         elif(self.fit == Display.SCROLL):
@@ -412,6 +411,7 @@ class GtkWorker(Process):
             pos[1] = self.imgDisplaySize[1]
         return tuple(pos)
 
+
     def _mouseOffset(self,pos):
         diff = self.offset
         return (pos[0]-diff[0],pos[1]-diff[1])
@@ -420,6 +420,7 @@ class GtkWorker(Process):
     def handle_leftDown(self, data):
         if self._leftMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._leftMouseDownPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -428,6 +429,7 @@ class GtkWorker(Process):
     def handle_rightDown(self, data):
         if self._rightMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._rightMouseDownPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -436,6 +438,7 @@ class GtkWorker(Process):
     def handle_leftUp(self,data):
         if self._leftMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._leftMouseUpPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -444,6 +447,7 @@ class GtkWorker(Process):
     def handle_rightUp(self,data):
         if self._rightMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._rightMouseUpPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -452,6 +456,7 @@ class GtkWorker(Process):
     def handle_middleDown(self,data):
         if self._middleMouseDownPos is not None:
             p = self._clamp(self._mouseOffset(self._middleMouseDownPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -460,6 +465,7 @@ class GtkWorker(Process):
     def handle_middleUp(self,data):
         if self._middleMouseUpPos is not None:
             p = self._clamp(self._mouseOffset(self._middleMouseUpPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -468,6 +474,7 @@ class GtkWorker(Process):
     def handle_mouseScrollPosition(self,data):
         if self._scrollPos is not None:
             p = self._clamp(self._mouseOffset(self._scrollPos))
+            p = (int(p[0]/self.scale[0]),int(p[1]/self.scale[1]))
         else:
             p = None
         self.connection.send((p,))
@@ -654,6 +661,7 @@ class GtkWorker(Process):
     def handle_mousePosition(self, data):
         if self._position is not None:
             pos = self._clamp(self._mouseOffset(self._position))
+            pos = (int(pos[0]/self.scale[0]),int(pos[1]/self.scale[1]))
         else:
             pos = None
         self.connection.send(pos)
