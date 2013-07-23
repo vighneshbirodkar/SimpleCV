@@ -796,6 +796,12 @@ class GtkWorker(Process):
             if shape.filled == True:
                 cr.fill()
             cr.stroke()
+        elif(type(shape) == Bezier):
+            cr.set_line_width(shape.width)
+            cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
+            cr.stroke()
+
+
 
     def getCentreOffset(self):
         """

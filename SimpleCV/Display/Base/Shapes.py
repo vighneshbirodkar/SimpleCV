@@ -57,9 +57,10 @@ class Ellipse(object):
         self.alpha = alpha
 
 class Bezier(object):
-    def __init__(self, points, color, antialias, alpha ):
+    def __init__(self, points, color, width, antialias, alpha ):
         self.points = points
         self.color = color
+        self.width = width
         self.antialias = antialias
         self.alpha = alpha
         
