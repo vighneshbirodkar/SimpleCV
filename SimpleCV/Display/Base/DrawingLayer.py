@@ -300,7 +300,7 @@ class DrawingLayer:
                 while 0 means transparent.
 
         """
-        self._shapes.append(Bezier(points,steps,color,width,antialias,alpha))
+        self._shapes.append(Bezier(points,color,width,antialias,alpha))
     
     def text(self, text, location, color = Color.DEFAULT,size = 20,font = "",bold = False ,italic = True,underline = False,  alpha = 255):
         """

@@ -777,6 +777,29 @@ class GtkWorker(Process):
             cr.set_font_size(shape.size)
             cr.move_to(*shape.location)
             cr.show_text(shape.text)
+        elif(type(shape) == Polygon):
+            cr.set_line_width(shape.width)
+            cr.move_to(*shape.points[-1])
+            for point in shape.points:
+                cr.line_to(*point)
+            cr.close_path()
+            if shape.filled == True:
+                cr.fill()
+            cr.stroke()
+        elif(type(shape) == Ellipse):
+            cr.set_line_width(shape.width)
+            cr.save()
+            cr.translate(shape.center[0]+shape.dimensions[0]/2.,shape.center[1]+shape.dimensions[1]/2.)
+            cr.scale(shape.dimensions[0]/float(shape.dimensions[1]), 1.)
+            cr.arc(0,0, shape.dimensions[1], 0., 2 * math.pi)
+            cr.restore()
+            if shape.filled == True:
+                cr.fill()
+            cr.stroke()
+        elif(type(shape) == Bezier):
+            cr.set_line_width(shape.width)
+            cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
+            cr.stroke()
 
 
 

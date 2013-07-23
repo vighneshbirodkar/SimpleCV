@@ -3719,7 +3719,7 @@ class Image:
         **EXAMPLE**
 
         >>> img = Image("lenna")
-        def drawCircle(self, ctr, rad, color = (0, 0, 0), thickness = 1):    >>> img.drawCircle((img.width/2,img.height/2),r=50,color=Colors.RED,width=3)
+        >>> img.drawCircle((img.width/2,img.height/2),r=50,color=Colors.RED,width=3)
         >>> img.show()
 
         **NOTES**
@@ -3728,7 +3728,7 @@ class Image:
           Note that this function is depricated, try to use DrawingLayer.circle() instead.
 
         **SEE ALSO**
-    def drawCircle(self, ctr, rad, color = (0, 0, 0), thickness = 1):
+
         :py:meth:`drawLine`
         :py:meth:`drawText`
         :py:meth:`dl`
@@ -3739,6 +3739,78 @@ class Image:
         
         self.getDrawingLayer().circle((int(ctr[0]), int(ctr[1])), int(rad), color, width, filled, antialias, alpha)
 
+    def drawPolygon(self,points,color = (0,0,0), width = 1, filled = False, antialias = True, alpha = 255):
+        """
+        **SUMMARY**
+
+        Draw a polygon from a list of (x,y)
+
+        **PARAMETERS**
+        
+        * *points* - The list of (x,y) coordinates of the vertices of the polygon
+        
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
+
+        * *filled* - Whether or not the rectangle is filled
+
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
+                    while 0 means transparent.
+                
+        """
+        self.getDrawingLayer().polygon(points,color, width, filled, antialias, alpha)
+
+    def drawEllipse(self, center, dimensions, color = (0,0,0), width = 1, filled = False, antialias = True, alpha = 255):
+        """
+        **SUMMARY**
+
+        Draw an ellipse given a location and a dimensions.
+        
+        **PARAMETERS**
+        
+        * *center* - The coordinates of the center.
+        
+        * *dimensions* - The length of axes along horizontal and vertical
+
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
+
+        * *filled* - Whether or not the rectangle is filled
+
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+                
+        """
+
+        self.getDrawingLayer().ellipse(center, dimensions, color, width, filled, antialias, alpha)
+
+    def drawBezier(self,points,color = (0,0,0), width = 1, antialias = True, alpha = 255):
+        """
+        **SUMMARY**
+
+        Draw a bezier curve based on the control points
+
+        **PARAMETERS**
+        
+        * *points* - Control points . You must specify more than 2 control points        
+
+        * *color* - Color object or Color Tuple.
+        
+        * *width* -  The width of the edges of the rectangle.
+
+        * *antialias* - Whether of not the edges are antialiased
+
+        * *alpha* - The alpha blending for the object. A value of 255 means opaque, 
+                while 0 means transparent.
+
+        """
+        self.getDrawingLayer().bezier(points, color, width,antialias, alpha)
 
 
     def drawLine(self, start, stop, color=(0,0,0) ,width =1, antialias = True,alpha = 255):
