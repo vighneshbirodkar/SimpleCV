@@ -777,6 +777,7 @@ class GtkWorker(Process):
             cr.set_font_size(shape.size)
             cr.move_to(*shape.location)
             cr.show_text(shape.text)
+            cr.stroke()
         elif(type(shape) == Polygon):
             cr.set_line_width(shape.width)
             cr.move_to(*shape.points[-1])
