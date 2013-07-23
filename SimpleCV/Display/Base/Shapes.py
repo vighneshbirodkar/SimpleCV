@@ -52,6 +52,7 @@ class Ellipse(object):
         self.dimensions = dimensions
         self.color = color
         self.width = width
+        self.filled = filled
         self.antialias = antialias
         self.alpha = alpha
 

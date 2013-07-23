@@ -778,6 +778,7 @@ class GtkWorker(Process):
             cr.move_to(*shape.location)
             cr.show_text(shape.text)
         elif(type(shape) == Polygon):
+            cr.set_line_width(shape.width)
             cr.move_to(*shape.points[-1])
             for point in shape.points:
                 cr.line_to(*point)
@@ -785,7 +786,16 @@ class GtkWorker(Process):
             if shape.filled == True:
                 cr.fill()
             cr.stroke()
-
+        elif(type(shape) == Ellipse):
+            cr.set_line_width(shape.width)
+            cr.save()
+            cr.translate(shape.center[0]+shape.dimensions[0]/2.,shape.center[1]+shape.dimensions[1]/2.)
+            cr.scale(shape.dimensions[0]/float(shape.dimensions[1]), 1.)
+            cr.arc(0,0, shape.dimensions[1], 0., 2 * math.pi)
+            cr.restore()
+            if shape.filled == True:
+                cr.fill()
+            cr.stroke()
 
     def getCentreOffset(self):
         """
