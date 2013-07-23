@@ -796,9 +796,17 @@ class GtkWorker(Process):
             if shape.filled == True:
                 cr.fill()
             cr.stroke()
-        elif(type(shape) == Bezier):
+        if(True):
+            p1 = (0,0)
+            p2 = (250,100)
+            p3 = (100,400)
+            p4 = 500,500
+            
+            print 'Bezier'
             cr.set_line_width(shape.width)
-            cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
+            #cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
+            cr.curve_to(p1[0],p1[1],p2[0],p2[1],p3[0],p3[1])
+            cr.curve_to(p2[0],p2[1],p3[0],p3[1],p4[0],p4[1])
             cr.stroke()
 
 
