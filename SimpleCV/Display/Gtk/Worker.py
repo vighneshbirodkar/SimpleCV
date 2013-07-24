@@ -8,6 +8,85 @@ import numpy as np
 from ... import Image
 import math
 
+def drawShape(cr,shape):
+    """
+    
+    **SUMMARY**
+    
+    Draws a shape on the image
+    
+
+    **PARAMETERS**
+    
+    * *cr* - The cairo context to draw on
+    
+    * *shape* - The shape to draw
+    
+    """
+    r,g,b = shape.color
+    r,g,b = float(r)/255,float(g)/255,float(b)/255
+    a = float(shape.alpha)/255
+    cr.set_source_rgba(r,g,b,a)
+    if(type(shape) == Line):
+        cr.set_line_width(shape.width)
+        cr.move_to(*shape.start)
+        cr.line_to(*shape.stop)
+        cr.stroke()
+    elif(type(shape) == Circle):
+        cr.set_line_width(shape.width)
+        cr.arc(shape.center[0],shape.center[1], shape.radius, 0., 2 * math.pi)
+        cr.stroke_preserve()
+        if shape.filled:
+            cr.fill()
+        else:
+            cr.stroke()
+    elif(type(shape) == Rectangle):
+        cr.set_line_width(shape.width)
+        w = shape.pt2[0]-shape.pt1[0]
+        h = shape.pt2[1]-shape.pt1[1]
+        cr.rectangle(shape.pt1[0],shape.pt1[1],w,h)
+        cr.stroke_preserve()
+        if shape.filled:
+            cr.fill()
+        else:
+            cr.stroke()
+    elif(type(shape) == Text):
+        cr.select_font_face(shape.font)
+        cr.set_font_size(shape.size)
+        cr.move_to(*shape.location)
+        cr.show_text(shape.text)
+        cr.stroke()
+    elif(type(shape) == Polygon):
+        cr.set_line_width(shape.width)
+        cr.move_to(*shape.points[-1])
+        for point in shape.points:
+            cr.line_to(*point)
+        cr.close_path()
+        if shape.filled:
+            cr.fill()
+        else:
+            cr.stroke()
+    elif(type(shape) == Ellipse):
+        cr.set_line_width(shape.width)
+        cr.save()
+        cr.translate(shape.center[0]+shape.dimensions[0]/2.,shape.center[1]+shape.dimensions[1]/2.)
+        cr.scale(shape.dimensions[0]/float(shape.dimensions[1]), 1.)
+        cr.arc(0,0, shape.dimensions[1], 0., 2 * math.pi)
+        cr.restore()
+        if shape.filled:
+            cr.fill()
+        else:
+            cr.stroke()
+    elif(type(shape) == Bezier):
+        cr.set_line_width(shape.width)
+        cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
+        cr.stroke()
+    elif(type(shape) == Bezier):
+        points = shape.points
+        cr.set_line_width(shape.width)
+        cr.curve_to(points[0][0],points[0][1],points[1][0],points[1][1],points[2][0],points[2][1],)
+        cr.stroke()
+
 
 #returns x,y,xScale,yScale
 #copied from adaptiveScale in ImageClass
@@ -730,82 +809,9 @@ class GtkWorker(Process):
         for layer in layers:
             
             for shape in layer.shapes():
-                self.drawShape(context,shape)
-            
-    def drawShape(self,cr,shape):
-        """
+                drawShape(context,shape)
+                
         
-        **SUMMARY**
-        
-        Draws a shape on the image
-        
-
-        **PARAMETERS**
-        
-        * *cr* - The cairo context to draw on
-        
-        * *shape* - The shape to draw
-        
-        """
-        r,g,b = shape.color
-        r,g,b = float(r)/255,float(g)/255,float(b)/255
-        a = float(shape.alpha)/255
-        cr.set_source_rgba(r,g,b,a)
-        if(type(shape) == Line):
-            cr.set_line_width(shape.width)
-            cr.move_to(*shape.start)
-            cr.line_to(*shape.stop)
-            cr.stroke()
-        elif(type(shape) == Circle):
-            cr.set_line_width(shape.width)
-            cr.arc(shape.center[0],shape.center[1], shape.radius, 0., 2 * math.pi)
-            cr.stroke_preserve()
-            if shape.filled:
-                cr.fill()
-            else:
-                cr.stroke()
-        elif(type(shape) == Rectangle):
-            cr.set_line_width(shape.width)
-            w = shape.pt2[0]-shape.pt1[0]
-            h = shape.pt2[1]-shape.pt1[1]
-            cr.rectangle(shape.pt1[0],shape.pt1[1],w,h)
-            cr.stroke_preserve()
-            if shape.filled:
-                cr.fill()
-            else:
-                cr.stroke()
-        elif(type(shape) == Text):
-            cr.select_font_face(shape.font)
-            cr.set_font_size(shape.size)
-            cr.move_to(*shape.location)
-            cr.show_text(shape.text)
-            cr.stroke()
-        elif(type(shape) == Polygon):
-            cr.set_line_width(shape.width)
-            cr.move_to(*shape.points[-1])
-            for point in shape.points:
-                cr.line_to(*point)
-            cr.close_path()
-            if shape.filled :
-                cr.fill()
-            else:
-                cr.stroke()
-        elif(type(shape) == Ellipse):
-            cr.set_line_width(shape.width)
-            cr.save()
-            cr.translate(shape.center[0]+shape.dimensions[0]/2.,shape.center[1]+shape.dimensions[1]/2.)
-            cr.scale(shape.dimensions[0]/float(shape.dimensions[1]), 1.)
-            cr.arc(0,0, shape.dimensions[1], 0., 2 * math.pi)
-            cr.restore()
-            if shape.filled == True:
-                cr.fill()
-            else:
-                cr.stroke()
-        if(type(shape) == Bezier):
-            points = shape.points
-            cr.set_line_width(shape.width)
-            cr.curve_to(points[0][0],points[0][1],points[1][0],points[1][1],points[2][0],points[2][1],)
-            cr.stroke()
     def getCentreOffset(self):
         """
         
