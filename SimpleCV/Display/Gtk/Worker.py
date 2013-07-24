@@ -760,18 +760,20 @@ class GtkWorker(Process):
             cr.set_line_width(shape.width)
             cr.arc(shape.center[0],shape.center[1], shape.radius, 0., 2 * math.pi)
             cr.stroke_preserve()
-            if shape.filled == True:
+            if shape.filled:
                 cr.fill()
-            cr.stroke()
+            else:
+                cr.stroke()
         elif(type(shape) == Rectangle):
             cr.set_line_width(shape.width)
             w = shape.pt2[0]-shape.pt1[0]
             h = shape.pt2[1]-shape.pt1[1]
             cr.rectangle(shape.pt1[0],shape.pt1[1],w,h)
             cr.stroke_preserve()
-            if shape.filled == True:
+            if shape.filled:
                 cr.fill()
-            cr.stroke()
+            else:
+                cr.stroke()
         elif(type(shape) == Text):
             cr.select_font_face(shape.font)
             cr.set_font_size(shape.size)
@@ -784,9 +786,10 @@ class GtkWorker(Process):
             for point in shape.points:
                 cr.line_to(*point)
             cr.close_path()
-            if shape.filled == True:
+            if shape.filled :
                 cr.fill()
-            cr.stroke()
+            else:
+                cr.stroke()
         elif(type(shape) == Ellipse):
             cr.set_line_width(shape.width)
             cr.save()
@@ -796,22 +799,13 @@ class GtkWorker(Process):
             cr.restore()
             if shape.filled == True:
                 cr.fill()
-            cr.stroke()
-        if(True):
-            p1 = (0,0)
-            p2 = (250,100)
-            p3 = (100,400)
-            p4 = 500,500
-            
-            print 'Bezier'
+            else:
+                cr.stroke()
+        if(type(shape) == Bezier):
+            points = shape.points
             cr.set_line_width(shape.width)
-            #cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
-            cr.curve_to(p1[0],p1[1],p2[0],p2[1],p3[0],p3[1])
-            cr.curve_to(p2[0],p2[1],p3[0],p3[1],p4[0],p4[1])
+            cr.curve_to(points[0][0],points[0][1],points[1][0],points[1][1],points[2][0],points[2][1],)
             cr.stroke()
-
-
-
     def getCentreOffset(self):
         """
         

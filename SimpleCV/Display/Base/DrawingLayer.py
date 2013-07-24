@@ -288,7 +288,7 @@ class DrawingLayer:
 
         **PARAMETERS**
         
-        * *points* - Control points . You must specify more than 2 control points        
+        * *points* - Control points . You must specify 3.       
 
         * *color* - Color object or Color Tuple.
         
