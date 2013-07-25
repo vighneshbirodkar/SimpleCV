@@ -280,10 +280,14 @@ class GtkWorker(Process):
         self.drawingArea.connect("button_release_event",self.mouse_release)
         self.drawingArea.connect("scroll_event",self.mouse_scroll)
         self.drawingArea.connect("motion_notify_event", self.mouse_motion)
-
+        
+        
         
         self.scrolledWindow.add_with_viewport(self.drawingArea)
         self.viewPort = self.scrolledWindow.children()[0]
+        self.posLabel = builder.get_object('posLabel')
+        self.colorArea = builder.get_object('colorArea')
+        self.colorLabel = builder.get_object('colorLabel')
 
         #when an image arrives, its data is stored here, a dict type when not None
         self.imageData = None
@@ -297,8 +301,11 @@ class GtkWorker(Process):
         #the size of the image, as it appears on the screen
         self.imgDisplaySize = None
         
-        #the x and y scale
+        #the x and y scale, used for RESIZE mode
         self.scale = None
+        
+        #used for SCROLL mode when user zooms in/out
+        self.globalScale = 1,1
         
         #the offset from the drawing layer at which image is drawn
         self.offset = None
@@ -327,6 +334,13 @@ class GtkWorker(Process):
         self._middleMouseUpPos = None
         self._scrollPos = None
         self._scrollDir = None
+
+        #things to hide
+        if(self.fit == Display.RESIZE):
+            button = builder.get_object('zoomInButton')
+            button.hide()
+            button = builder.get_object('zoomOutButton')
+            button.hide()
 
         if(self.type_ == Display.FULLSCREEN):
             self.window.fullscreen()
@@ -526,7 +540,24 @@ class GtkWorker(Process):
         """
 
         self._position = (event.x,event.y)
+        x = int(event.x/self.scale[0])
+        y = int(event.y/self.scale[1])
+        w,h = self.pixbuf.get_width(),self.pixbuf.get_height()
+        x = min(max(x,0),w-1)
+        y = min(max(y,0),h-1)
+        self.posLabel.set_text(`(x,y)`)
+        r,g,b = color = self.pixbuf.pixel_array[y,x]
+        self.colorLabel.set_label(`(r,g,b)`)
+        r,g,b = float(r)/255,float(g)/255,float(b)/255
+        
 
+        cr = self.colorArea.window.cairo_create()
+        w = self.colorArea.get_allocation().width
+        h = self.colorArea.get_allocation().height
+        cr.set_source_rgb(r,g,b)
+        cr.rectangle(0,0,w,h)
+        cr.fill()
+        
     def mouse_press(self,widget,event):
         """
         
@@ -764,6 +795,7 @@ class GtkWorker(Process):
         if(self.fit == Display.SCROLL):
             #no resizing required
             pix = self.pixbuf
+            
         elif(self.fit == Display.RESIZE):
             #resize the image to fit drawingArea
             areaWidth = self.drawingArea.get_allocation().width
@@ -778,8 +810,10 @@ class GtkWorker(Process):
             #take care of the excess part
             self.imgDisplaySize = self.imgRealSize
             self.offset = 0,0
-            self.scale = 1,1
-            self.drawingArea.set_size_request(*self.imgRealSize)
+            self.scale = self.globalScale
+            self.imgDisplaySize = self.imgDisplaySize[0]*self.globalScale[0],self.imgDisplaySize[1]*self.globalScale[1]
+            sr = int(self.imgDisplaySize[0]),int(self.imgDisplaySize[1])
+            self.drawingArea.set_size_request(*sr)
         elif(self.fit == Display.RESIZE):
             # reduce the request so the window can be shrunk to lesser than the
             # image size
@@ -800,12 +834,19 @@ class GtkWorker(Process):
         cr.clip()
         
         #draw the image
-        cr.set_source_pixbuf(pix,self.offset[0],self.offset[1])
-        cr.paint()
+        if(self.fit == Display.SCROLL):
+            cr.scale(*self.globalScale)
+            cr.set_source_pixbuf(pix,self.offset[0],self.offset[1])
+            cr.paint()
+        else:
+            cr.set_source_pixbuf(pix,self.offset[0],self.offset[1])
+            cr.paint()
+            cr.translate(*self.offset)
+            cr.scale(*self.scale)
+
         
         #scale and translate the drawings
-        cr.translate(*self.offset)
-        cr.scale(*self.scale)
+
         
         self.drawLayers(cr)
         
@@ -900,4 +941,11 @@ class GtkWorker(Process):
         
         """
         self.connection.send(self._position)
+    
+    def zoomIn(self,data=None):
+        self.globalScale = self.globalScale[0] + 0.1,self.globalScale[1] + 0.1
+        self.drawingArea.queue_draw()
+    def zoomOut(self,data=None):
+        self.globalScale = self.globalScale[0] - 0.1,self.globalScale[1] - 0.1
+        self.drawingArea.queue_draw()
 
