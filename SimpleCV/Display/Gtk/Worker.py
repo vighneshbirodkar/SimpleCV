@@ -7,6 +7,7 @@ from ..Base.Display import *
 import numpy as np
 from ... import Image
 import math
+import cairo
 
 def drawShape(cr,shape):
     """
@@ -27,6 +28,7 @@ def drawShape(cr,shape):
     r,g,b = float(r)/255,float(g)/255,float(b)/255
     a = float(shape.alpha)/255
     cr.set_source_rgba(r,g,b,a)
+    cr.set_antialias(cairo.ANTIALIAS_DEFAULT if shape.antialias else cairo.ANTIALIAS_NONE)
     if(type(shape) == Line):
         cr.set_line_width(shape.width)
         cr.move_to(*shape.start)
@@ -51,11 +53,31 @@ def drawShape(cr,shape):
         else:
             cr.stroke()
     elif(type(shape) == Text):
-        cr.select_font_face(shape.font)
+    
+        slant = cairo.FONT_SLANT_ITALIC if shape.italic else cairo.FONT_SLANT_NORMAL
+        weight = cairo.FONT_WEIGHT_BOLD if shape.bold else cairo.FONT_WEIGHT_NORMAL
+        cr.select_font_face(shape.font,slant,weight)
         cr.set_font_size(shape.size)
+        x,y,w,h, = cr.text_extents(shape.text)[:4]
+    
+        if(shape.bg):
+            #drawing the text background
+            cr.rectangle(shape.location[0]+x,shape.location[1]+y,w,h)
+            r,g,b = shape.bg
+            r,g,b = float(r)/255,float(g)/255,float(b)/255
+            a = float(shape.alpha)/255
+            cr.set_source_rgba(r,g,b,a)
+            cr.fill()
+            r,g,b = shape.color
+            
+        r,g,b = float(r)/255,float(g)/255,float(b)/255
+        a = float(shape.alpha)/255
+        cr.set_source_rgba(r,g,b,a)
+        
         cr.move_to(*shape.location)
         cr.show_text(shape.text)
         cr.stroke()
+
     elif(type(shape) == Polygon):
         cr.set_line_width(shape.width)
         cr.move_to(*shape.points[-1])
@@ -77,10 +99,6 @@ def drawShape(cr,shape):
             cr.fill()
         else:
             cr.stroke()
-    elif(type(shape) == Bezier):
-        cr.set_line_width(shape.width)
-        cr.curve_to(shape.points[0][0],shape.points[0][1], shape.points[1][0],shape.points[1][1], shape.points[2][0],shape.points[2][1])
-        cr.stroke()
     elif(type(shape) == Bezier):
         points = shape.points
         cr.set_line_width(shape.width)

@@ -68,7 +68,7 @@ class Bezier(object):
         self.alpha = alpha
         
 class Text(object):
-    def __init__(self, text, location, color ,size, font , bold ,italic ,underline, alpha):
+    def __init__(self, text, location, color ,size, font , bold ,italic ,underline, alpha,bg = None):
         self.text = text
         self.location = location
         self.font = font
@@ -78,5 +78,7 @@ class Text(object):
         self.underline = underline
         self.color = color
         self.alpha = alpha
+        self.bg = bg # comes into play for ezViewText
+        self.antialias = True # TODO maybe push this to the API
 
 

@@ -302,7 +302,7 @@ class DrawingLayer:
         """
         self._shapes.append(Bezier(points,color,width,antialias,alpha))
     
-    def text(self, text, location, color = Color.DEFAULT,size = 20,font = "",bold = False ,italic = True,underline = False,  alpha = 255):
+    def text(self, text, location, color = Color.DEFAULT,size = 20,font = "",bold = False ,italic = False,underline = False,  alpha = 255):
         """
         **SUMMARY**
 
@@ -330,8 +330,7 @@ class DrawingLayer:
                 while 0 means transparent.
 
         """
-        #TODO the docs
-        self._shapes.append(Text(text,location, color, size, font, bold, italic, underline, alpha))
+        self._shapes.append(Text(text,location, color, size, font, bold, italic, underline, alpha,None))
     
     def sprite(self,img,pos=(0,0),scale=1.0,rot=0.0,alpha=255):
         """
@@ -381,5 +380,31 @@ class DrawingLayer:
         erased completely)
         """
         self._shapes = []
-    #TODO ezview text
+    
+    def ezViewText(self,text,location,color = (255,255,255),size = 20,bgColor = (0,0,0)):
+        """
+        **SUMMARY**
+
+        ezViewText works just like text but it sets both the foreground and background
+        color and overwrites the image pixels. Use this method to make easily
+        viewable text on a dynamic video stream.
+
+        **PARAMETERS**
+        
+        * *text* -  A text string to print.
+
+        * *location* - The location to place the top right corner of the text
+
+        * *color* - Color of the text.
+        
+        * *size* - The size of letters.
+        
+        * *bgColor* - The colour of the background.
+        """
+        #TODO Maybe include all paramaters for text over here, if required
+        self._shapes.append(Text(text,location, color, size, "", False, False, False, 255,bgColor))
+    
+    
+    
+    
     #TODO rotatedrectangle
