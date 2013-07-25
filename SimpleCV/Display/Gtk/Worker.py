@@ -70,6 +70,7 @@ def drawShape(cr,shape):
             cr.fill()
             r,g,b = shape.color
             
+        r,g,b = shape.color
         r,g,b = float(r)/255,float(g)/255,float(b)/255
         a = float(shape.alpha)/255
         cr.set_source_rgba(r,g,b,a)
@@ -540,8 +541,8 @@ class GtkWorker(Process):
         """
 
         self._position = (event.x,event.y)
-        x = int(event.x/self.scale[0])
-        y = int(event.y/self.scale[1])
+        x = int((event.x - 0)/self.scale[0])
+        y = int((event.y - 0)/self.scale[1])
         w,h = self.pixbuf.get_width(),self.pixbuf.get_height()
         x = min(max(x,0),w-1)
         y = min(max(y,0),h-1)
