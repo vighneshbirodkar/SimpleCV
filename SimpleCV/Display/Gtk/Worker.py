@@ -338,11 +338,9 @@ class GtkWorker(Process):
 
         #things to hide
         if(self.fit == Display.RESIZE):
-            button = builder.get_object('zoomInButton')
-            button.hide()
-            button = builder.get_object('zoomOutButton')
-            button.hide()
-
+            toolbar = builder.get_object('toolbar')
+            toolbar.hide()
+        
         if(self.type_ == Display.FULLSCREEN):
             self.window.fullscreen()
         elif(self.type_ == Display.FIXED):
@@ -356,7 +354,6 @@ class GtkWorker(Process):
         if(self.fit == Display.RESIZE):
             self.scrolledWindow.set_policy(self.gtk.POLICY_NEVER, self.gtk.POLICY_NEVER)
         elif(self.fit == Display.SCROLL):
-            print 'scroll'
             self.scrolledWindow.set_policy(self.gtk.POLICY_AUTOMATIC, self.gtk.POLICY_AUTOMATIC)
         else:
             raise ValueError("The fit method was not understood")
@@ -541,8 +538,8 @@ class GtkWorker(Process):
         """
 
         self._position = (event.x,event.y)
-        x = int((event.x - 0)/self.scale[0])
-        y = int((event.y - 0)/self.scale[1])
+        x = int((event.x - self.offset[0])/self.scale[0])
+        y = int((event.y - self.offset[1])/self.scale[1])
         w,h = self.pixbuf.get_width(),self.pixbuf.get_height()
         x = min(max(x,0),w-1)
         y = min(max(y,0),h-1)
@@ -949,4 +946,43 @@ class GtkWorker(Process):
     def zoomOut(self,data=None):
         self.globalScale = self.globalScale[0] - 0.1,self.globalScale[1] - 0.1
         self.drawingArea.queue_draw()
+    def fullscreen(self,data = None):
+        if(data.get_active()):
+            self.window.fullscreen()
+        else:
+            self.window.unfullscreen()
+        
+    def saveDisplay(self,data = None):
+        dest = self.gtk.gdk.Pixbuf(self.gtk.gdk.COLORSPACE_RGB,False,8,self.imgDisplaySize[0],self.imgDisplaySize[1])
+        colormap = self.drawingArea.window.get_colormap()
+        pixbuf = self.gtk.gdk.Pixbuf(self.gtk.gdk.COLORSPACE_RGB, 0, 8, *self.imgDisplaySize)
+        pixbuf.get_from_drawable(self.drawingArea.window,colormap,self.offset[0],self.offset[1],0,0,*self.imgDisplaySize)
+        
+        chooser = self.gtk.FileChooserDialog(title="Save Image",action=self.gtk.FILE_CHOOSER_ACTION_SAVE,
+                                  buttons=(self.gtk.STOCK_CANCEL,self.gtk.RESPONSE_CANCEL,self.gtk.STOCK_SAVE,self.gtk.RESPONSE_OK))
+        chooser.set_default_response(self.gtk.RESPONSE_CANCEL)
+        filter = self.gtk.FileFilter()
+        filter.set_name("Images")
+        filter.add_mime_type("image/png")
+        filter.add_mime_type("image/jpeg")
+        filter.add_pattern("*.png")
+        filter.add_pattern("*.jpg")
+        chooser.add_filter(filter)
+        
+        response = chooser.run()
+        if response == self.gtk.RESPONSE_OK:
+            name = chooser.get_filename()
+            if(name.upper().endswith(".JPG")):
+                pixbuf.save(name,"jpeg", {"quality":"100"})
+            elif(name.upper().endswith(".PNG")):
+                pixbuf.save(name,"png",{})
+            else:
+                md = self.gtk.MessageDialog(None,flags = 0 ,
+                    type =  self.gtk.MESSAGE_ERROR, 
+                    buttons = self.gtk.BUTTONS_CLOSE)
+                md.set_markup("Unsupported Extension\nOnly JPG and PNG are supported")
+                md.run()
+                md.destroy()
+        chooser.destroy()
 
+        

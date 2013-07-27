@@ -60,7 +60,6 @@ class GtkDisplay(Display.DisplayBase):
         """
         if(self.connection.poll()):
             if(self.connection.recv() == 'Kill Me' ):
-                print "rec"
                 # " Hasta La Vista , Baby "
                 # http://www.youtube.com/watch?v=DMGh82QHVcQ
                 self.worker.terminate()
