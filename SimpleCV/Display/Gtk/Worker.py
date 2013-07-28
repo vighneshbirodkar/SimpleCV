@@ -8,6 +8,7 @@ import numpy as np
 from ... import Image
 import math
 import cairo
+from ...Color import Color
 
 def drawShape(cr,shape):
     """
@@ -218,7 +219,7 @@ class GtkWorker(Process):
     
     #the glade file contatning the gtk GUI layout
     _gladeFile = "main.glade"
-    BGCOLOR = (.5,.5,1.0)
+    BGCOLOR = (0,0,0)
     def __init__(self,connection,size,type_,title,fit):
         """
         **SUMMARY**
@@ -984,5 +985,21 @@ class GtkWorker(Process):
                 md.run()
                 md.destroy()
         chooser.destroy()
+        
+    def findLines(self,data=None):
+        img = self.getImage()
+        fs = img.findLines()
+        fs.draw(width = 3)
+        self.putImage(img)
+        pass
+    def putImage(self,img):
+        dic = {}
+        dic['function'] = 'showImage'
+        dic['data'] = img.toString()
+        dic['depth'] = img.depth
+        dic['width'] = img.width
+        dic['height'] = img.height
+        dic['layers'] = img.layers()
+        self.handle_showImage(dic)
 
         
