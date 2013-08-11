@@ -270,6 +270,8 @@ class GtkWorker(Process):
         self.window = builder.get_object("window")
         self.scrolledWindow = builder.get_object("scrolledWindow")
         self.drawingArea = gtk.DrawingArea()
+        self.builderWindow = builder.get_object("builderWindow")
+        self.applyListStore = builder.get_object("applyListStore")
 
         #Masks are added to get mouse button press, release and mouse pointer motion events
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK|gtk.gdk.POINTER_MOTION_MASK)
@@ -318,6 +320,7 @@ class GtkWorker(Process):
         
         self.window.set_title(self.title)
         self.window.show_all()
+        self.builderWindow.show_all()
 
         #size of the window
         self._winWidth, self._winHeight = self.window.get_size()
@@ -363,6 +366,13 @@ class GtkWorker(Process):
         #Gtk calls this function when it has nothing else to do. This ensures 
         #that the worker repeatedly checks for arriving messages
         gobject.idle_add(self.pollMsg,None)
+
+
+##########################################################
+        self.applyListStore.prepend(("Hi",))
+
+
+
 
         gtk.main()
 
