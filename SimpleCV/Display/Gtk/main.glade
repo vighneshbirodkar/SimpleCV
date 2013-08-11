@@ -240,6 +240,24 @@
                         <signal name="activate" handler="findLines" swapped="no"/>
                       </object>
                     </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem5">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Find Circles</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="findCircles" swapped="no"/>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="menuitem6">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Find Corners</property>
+                        <property name="use_underline">True</property>
+                        <signal name="activate" handler="findCorners" swapped="no"/>
+                      </object>
+                    </child>
                   </object>
                 </child>
               </object>
