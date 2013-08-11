@@ -272,6 +272,9 @@ class GtkWorker(Process):
         self.drawingArea = gtk.DrawingArea()
         self.builderWindow = builder.get_object("builderWindow")
         self.applyListStore = builder.get_object("applyListStore")
+        self.filterListStore = builder.get_object("filterListStore")
+        self.filterTreeview = builder.get_object("filterTreeview")
+        self.applyTreeview = builder.get_object("applyTreeview")
 
         #Masks are added to get mouse button press, release and mouse pointer motion events
         self.drawingArea.set_events(gtk.gdk.BUTTON_PRESS_MASK|gtk.gdk.BUTTON_RELEASE_MASK|gtk.gdk.POINTER_MOTION_MASK)
@@ -317,6 +320,9 @@ class GtkWorker(Process):
         #the image being displayed, a simplecv Image object, set only when
         #necessary
         self.image = None
+        
+        #the unadulterated image
+        self.noFilterImage = None
         
         self.window.set_title(self.title)
         self.window.show_all()
@@ -366,13 +372,6 @@ class GtkWorker(Process):
         #Gtk calls this function when it has nothing else to do. This ensures 
         #that the worker repeatedly checks for arriving messages
         gobject.idle_add(self.pollMsg,None)
-
-
-##########################################################
-        self.applyListStore.prepend(("Hi",))
-
-
-
 
         gtk.main()
 
@@ -437,6 +436,7 @@ class GtkWorker(Process):
     
         #invalidate existing image
         self.image = None
+        self.noFilterImage = None
         self.imageData = data
         self.imgRealSize = (data['width'],data['height'])
         
@@ -548,6 +548,9 @@ class GtkWorker(Process):
         
         """
 
+        #initially when there is no image
+        if(not self.offset):
+            return
         self._position = (event.x,event.y)
         x = int((event.x - self.offset[0])/self.scale[0])
         y = int((event.y - self.offset[1])/self.scale[1])
@@ -820,7 +823,7 @@ class GtkWorker(Process):
             self.imgDisplaySize = self.imgRealSize
             self.offset = 0,0
             self.scale = self.globalScale
-            self.imgDisplaySize = self.imgDisplaySize[0]*self.globalScale[0],self.imgDisplaySize[1]*self.globalScale[1]
+            self.imgDisplaySize = int(self.imgDisplaySize[0]*self.globalScale[0]),int(self.imgDisplaySize[1]*self.globalScale[1])
             sr = int(self.imgDisplaySize[0]),int(self.imgDisplaySize[1])
             self.drawingArea.set_size_request(*sr)
         elif(self.fit == Display.RESIZE):
@@ -828,7 +831,7 @@ class GtkWorker(Process):
             # image size
             self.drawingArea.set_size_request(10,10)
             
-            self.imgDisplaySize =  (pix.get_width(),pix.get_height())
+            self.imgDisplaySize =  (int(pix.get_width()),int(pix.get_height()))
             self.offset = self.getCentreOffset()
             self.scale = float(self.imgDisplaySize[0])/self.imgRealSize[0] , float(self.imgDisplaySize[1])/self.imgRealSize[1]
             
@@ -964,10 +967,6 @@ class GtkWorker(Process):
             self.window.unfullscreen()
         
     def saveDisplay(self,data = None):
-        dest = self.gtk.gdk.Pixbuf(self.gtk.gdk.COLORSPACE_RGB,False,8,self.imgDisplaySize[0],self.imgDisplaySize[1])
-        colormap = self.drawingArea.window.get_colormap()
-        pixbuf = self.gtk.gdk.Pixbuf(self.gtk.gdk.COLORSPACE_RGB, 0, 8, *self.imgDisplaySize)
-        pixbuf.get_from_drawable(self.drawingArea.window,colormap,self.offset[0],self.offset[1],0,0,*self.imgDisplaySize)
         
         chooser = self.gtk.FileChooserDialog(title="Save Image",action=self.gtk.FILE_CHOOSER_ACTION_SAVE,
                                   buttons=(self.gtk.STOCK_CANCEL,self.gtk.RESPONSE_CANCEL,self.gtk.STOCK_SAVE,self.gtk.RESPONSE_OK))
@@ -984,9 +983,9 @@ class GtkWorker(Process):
         if response == self.gtk.RESPONSE_OK:
             name = chooser.get_filename()
             if(name.upper().endswith(".JPG")):
-                pixbuf.save(name,"jpeg", {"quality":"100"})
+                self.pixbuf.save(name,"jpeg", {"quality":"100"})
             elif(name.upper().endswith(".PNG")):
-                pixbuf.save(name,"png",{})
+                self.pixbuf.save(name,"png",{})
             else:
                 md = self.gtk.MessageDialog(None,flags = 0 ,
                     type =  self.gtk.MESSAGE_ERROR, 
@@ -1002,6 +1001,7 @@ class GtkWorker(Process):
         fs.draw(width = 3)
         self.putImage(img)
         pass
+        
     def putImage(self,img):
         dic = {}
         dic['function'] = 'showImage'
@@ -1010,6 +1010,46 @@ class GtkWorker(Process):
         dic['width'] = img.width
         dic['height'] = img.height
         dic['layers'] = img.layers()
-        self.handle_showImage(dic)
-
         
+        self.image = None
+        self.imageData = dic
+        self.imgRealSize = (img.width,img.height)
+        
+        #convert the string to a pixbuf
+        self.pixbuf =  self.gtk.gdk.pixbuf_new_from_data(dic['data'], self.gtk.gdk.COLORSPACE_RGB, False, dic['depth'], dic['width'], dic['height'], dic['width']*3)
+        
+        # tell gtk to draw again
+        self.drawingArea.queue_draw()
+        
+    def addFilter(self,data=None):
+
+        model,iterator =  self.filterTreeview.get_selection().get_selected()
+        if(iterator):
+            path = model.get_path(iterator)
+            index = path[0]
+            filter_ =  model[index][0]
+            self.applyListStore.append((filter_,))
+            
+        self.applyListStore.foreach(self.applyFilter,None)
+            
+    def removeFilter(self,data=None):
+        model,iterator =  self.applyTreeview.get_selection().get_selected()
+        if(iterator):
+            model.remove(iterator)
+            
+        
+        self.putImage(self.noFilterImage)
+        self.applyListStore.foreach(self.applyFilter,None)
+    
+    def applyFilter(self,model, path, iterator,data=None):
+        #print self.noFilterImage 
+        if( not self.noFilterImage ):
+            self.noFilterImage = self.getImage()
+        path = model.get_path(iterator)
+        index = path[0]
+        filter_ = model[index][0]
+        img = self.getImage()
+        function = getattr(img,filter_)
+        newImg = function()
+        self.putImage(newImg)
+
