@@ -2165,7 +2165,7 @@ class Image:
 
         """
         if self.isGray():
-            return self.getBitmap().toString()
+            return self.getBitmap().tostring()
         return self.toRGB().getBitmap().tostring()
 
 
