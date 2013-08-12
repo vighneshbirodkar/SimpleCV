@@ -2164,6 +2164,8 @@ class Image:
         The image, converted to rgb, then converted to a string.
 
         """
+        if self.isGray():
+            return self.getBitmap().tostring()
         return self.toRGB().getBitmap().tostring()
 
 
